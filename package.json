@@ -1,0 +1,10 @@
+{
+  "name": "Proyecto-software",
+  "version": "1.0.0",
+  "engines": {
+    "node": "24.15.0"
+  },
+  "dependencies": {
+    "typescript": "253.29346.240"
+  }
+}
