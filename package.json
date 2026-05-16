@@ -5,6 +5,6 @@
     "node": "24.15.0"
   },
   "dependencies": {
-    "typescript": "253.29346.240"
+    "typescript": "^5.8.3"
   }
 }
