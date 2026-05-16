@@ -39,7 +39,12 @@ export class UsersService {
                 message: 'Correo electrónico no válido'
             };
         }
-        const newUser = new Usuario(0,registerDto.name,registerDto.apellido, registerDto.email, registerDto.password, registerDto.telefono);
+        const newUser = new Usuario(0,
+            registerDto.name,
+            registerDto.apellido,
+            registerDto.email,
+            registerDto.password,
+            registerDto.telefono);
 
         return {
             success: true,
