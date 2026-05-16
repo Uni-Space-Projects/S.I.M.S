@@ -2,55 +2,80 @@ import { Injectable } from '@nestjs/common';
 import {Usuario} from "./Usuario";
 import {LoginDto} from "./dto/Login.Dto";
 import {RegisterDto} from "./dto/Register.Dto";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UserEntity } from './users.entity';
 
 //Injectable significa que puedes usar esta clase en otras clases
 @Injectable()
 export class UsersService {
-    login(loginDto: LoginDto) {
-    //TODO:Logica para comprobar datos del login.
+    constructor(
+        @InjectRepository(UserEntity)
+        private userRepository: Repository<UserEntity>,
+    ) {}
 
-        // Simulación de usuario (fake DB por ahora)
-        if (loginDto.email === 'test@test.com' && loginDto.password === '1234') {
+    async login(loginDto: LoginDto) {
+
+        const user = await this.userRepository.findOne({
+            where: { correo: loginDto.email }
+        });
+
+        if (!user || user.contrasena !== loginDto.password) {
             return {
-                success: true,
-                message: 'Login correcto',
-                user: {
-                    email: loginDto.email
-                }
+                success: false,
+                message: 'Credenciales incorrectas'
             };
         }
 
         return {
-            success: false,
-            message: 'Credenciales incorrectas'
+            success: true,
+            message: 'Login correcto',
+            user: {
+                email: user.correo
+            }
         };
     }
 
-    register (registerDto: RegisterDto) {
-        // TODO:Aquí iría la lógica para guardar el usuario en la base de datos
-        //regex \w:Matches word characters (a-z, A-Z, 0-9, _)
-        // +: al menos 1 o mas elementos del previo
-        //\.: pones la barra ya que es un elemento reservado para que valide que haya un punto.
-        const emailPattern = /\w+@\w+\.\w+/
+    async register(registerDto: RegisterDto) {
+
+        const emailPattern = /\w+@\w+\.\w+/;
         const verificarEmail = emailPattern.test(registerDto.email);
+
         if (!verificarEmail) {
             return {
                 success: false,
                 message: 'Correo electrónico no válido'
             };
         }
-        const newUser = new Usuario(0,
-            registerDto.name,
-            registerDto.apellido,
-            registerDto.email,
-            registerDto.password,
-            registerDto.telefono);
+
+        // 🔍 verificar si ya existe
+        const userExists = await this.userRepository.findOne({
+            where: { correo: registerDto.email }
+        });
+
+        if (userExists) {
+            return {
+                success: false,
+                message: 'El usuario ya existe'
+            };
+        }
+
+        // 🧱 crear usuario en DB
+        const user = this.userRepository.create({
+            nombre: registerDto.name,
+            apellido: registerDto.apellido,
+            correo: registerDto.email,
+            contrasena: registerDto.password,
+            telefono: registerDto.telefono
+        });
+
+        await this.userRepository.save(user);
 
         return {
             success: true,
-            message: 'Credenciales registradas correctamente',
+            message: 'Usuario registrado correctamente',
             user: {
-                email: registerDto.email
+                email: user.correo
             }
         };
     }
