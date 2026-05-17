@@ -24,6 +24,7 @@ export class PublicationsService {
             ...dto,
             expirationDate: expiration,
             isActive: true,
+
         });
 
         return await this.publicationRepository.save(publication);
