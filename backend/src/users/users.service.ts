@@ -1,56 +1,101 @@
-import { Injectable } from '@nestjs/common';
-import {Usuario} from "./Usuario";
+import {Injectable} from '@nestjs/common';
 import {LoginDto} from "./dto/Login.Dto";
 import {RegisterDto} from "./dto/Register.Dto";
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
+import {UserEntity} from './users.entity';
+import * as bcrypt from 'bcrypt';
+import {Role} from "./roles.enum";
 
 //Injectable significa que puedes usar esta clase en otras clases
 @Injectable()
 export class UsersService {
-    login(loginDto: LoginDto) {
-    //TODO:Logica para comprobar datos del login.
+    constructor(
+        @InjectRepository(UserEntity)
+        private userRepository: Repository<UserEntity>,
+    ) {}
 
-        // Simulación de usuario (fake DB por ahora)
-        if (loginDto.email === 'test@test.com' && loginDto.password === '1234') {
+    async login(loginDto: LoginDto) {
+
+        const user = await this.userRepository.findOne({
+            where: { email: loginDto.email }
+        });
+
+        if (!user){
+            return {
+                success: false,
+                message: 'Usuario no encontrado'
+            }
+        }
+        // @ts-ignore
+        const passwordMatch = await bcrypt.compare(
+            loginDto.password,
+            user.contrasena
+        );
+
+        if (!passwordMatch) {
+            return {
+                success: false,
+                message: 'Credenciales incorrectas'
+            };
+        }
+        else{
             return {
                 success: true,
                 message: 'Login correcto',
                 user: {
-                    email: loginDto.email
+                    email: user.email
                 }
             };
         }
 
-        return {
-            success: false,
-            message: 'Credenciales incorrectas'
-        };
+        //if (user.rol === Role.ADMIN) {
+            //TODO:Funcionalidades agregadas si el usuario es admin.
+        //}
     }
 
-    register (registerDto: RegisterDto) {
-        // TODO:Aquí iría la lógica para guardar el usuario en la base de datos
-        //regex \w:Matches word characters (a-z, A-Z, 0-9, _)
-        // +: al menos 1 o mas elementos del previo
-        //\.: pones la barra ya que es un elemento reservado para que valide que haya un punto.
-        const emailPattern = /\w+@\w+\.\w+/
+    async register(registerDto: RegisterDto) {
+
+        const emailPattern = /\w+@\w+\.\w+/;
         const verificarEmail = emailPattern.test(registerDto.email);
+
         if (!verificarEmail) {
             return {
                 success: false,
                 message: 'Correo electrónico no válido'
             };
         }
-        const newUser = new Usuario(0,
-            registerDto.name,
-            registerDto.apellido,
-            registerDto.email,
-            registerDto.password,
-            registerDto.telefono);
+
+        // 🔍 verificar si ya existe
+        const userExists = await this.userRepository.findOne({
+            where: { email: registerDto.email }
+        });
+
+        if (userExists) {
+            return {
+                success: false,
+                message: 'El usuario ya existe'
+            };
+        }
+
+        const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+        // 🧱 crear usuario en DB
+        const user = this.userRepository.create({
+            nombre: registerDto.name,
+            apellido: registerDto.apellido,
+            email: registerDto.email,
+            contrasena: hashedPassword,
+            telefono: registerDto.telefono,
+            rol: Role.USER
+        });
+
+        await this.userRepository.save(user);
 
         return {
             success: true,
-            message: 'Credenciales registradas correctamente',
+            message: 'Usuario registrado correctamente',
             user: {
-                email: registerDto.email
+                email: user.email
             }
         };
     }
