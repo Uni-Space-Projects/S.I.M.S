@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import {Usuario} from "./Usuario";
+import {Injectable} from '@nestjs/common';
 import {LoginDto} from "./dto/Login.Dto";
 import {RegisterDto} from "./dto/Register.Dto";
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { UserEntity } from './users.entity';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
+import {UserEntity} from './users.entity';
+import * as bcrypt from 'bcrypt';
+import {Role} from "./roles.enum";
 
 //Injectable significa que puedes usar esta clase en otras clases
 @Injectable()
@@ -17,23 +18,40 @@ export class UsersService {
     async login(loginDto: LoginDto) {
 
         const user = await this.userRepository.findOne({
-            where: { correo: loginDto.email }
+            where: { email: loginDto.email }
         });
 
-        if (!user || user.contrasena !== loginDto.password) {
+        if (!user){
+            return {
+                success: false,
+                message: 'Usuario no encontrado'
+            }
+        }
+        // @ts-ignore
+        const passwordMatch = await bcrypt.compare(
+            loginDto.password,
+            user.contrasena
+        );
+
+        if (!passwordMatch) {
             return {
                 success: false,
                 message: 'Credenciales incorrectas'
             };
         }
+        else{
+            return {
+                success: true,
+                message: 'Login correcto',
+                user: {
+                    email: user.email
+                }
+            };
+        }
 
-        return {
-            success: true,
-            message: 'Login correcto',
-            user: {
-                email: user.correo
-            }
-        };
+        //if (user.rol === Role.ADMIN) {
+            //TODO:Funcionalidades agregadas si el usuario es admin.
+        //}
     }
 
     async register(registerDto: RegisterDto) {
@@ -50,7 +68,7 @@ export class UsersService {
 
         // 🔍 verificar si ya existe
         const userExists = await this.userRepository.findOne({
-            where: { correo: registerDto.email }
+            where: { email: registerDto.email }
         });
 
         if (userExists) {
@@ -60,13 +78,15 @@ export class UsersService {
             };
         }
 
+        const hashedPassword = await bcrypt.hash(registerDto.password, 10);
         // 🧱 crear usuario en DB
         const user = this.userRepository.create({
             nombre: registerDto.name,
             apellido: registerDto.apellido,
-            correo: registerDto.email,
-            contrasena: registerDto.password,
-            telefono: registerDto.telefono
+            email: registerDto.email,
+            contrasena: hashedPassword,
+            telefono: registerDto.telefono,
+            rol: Role.USER
         });
 
         await this.userRepository.save(user);
@@ -75,7 +95,7 @@ export class UsersService {
             success: true,
             message: 'Usuario registrado correctamente',
             user: {
-                email: user.correo
+                email: user.email
             }
         };
     }
