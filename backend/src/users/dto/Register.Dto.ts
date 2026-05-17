@@ -11,7 +11,7 @@ export class RegisterDto {
     apellido: string;
 
     @IsEmail()
-    correo: string;
+    email: string;
 
     @IsString()
     @MinLength(6)
@@ -21,6 +21,6 @@ export class RegisterDto {
     @MinLength(7)
     telefono: string;
 
-    @IsString()
-    email: string;
+    rol: "usuario";
+
 }
