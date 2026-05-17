@@ -79,7 +79,7 @@ export class UsersService {
         }
 
         const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-        // 🧱 crear usuario en DB
+        // crear usuario en DB
         const user = this.userRepository.create({
             nombre: registerDto.name,
             apellido: registerDto.apellido,
