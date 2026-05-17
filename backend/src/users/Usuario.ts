@@ -1,4 +1,3 @@
-
 export class Usuario {
     private _id: number;
     private _nombre:string
@@ -79,3 +78,4 @@ export class Usuario {
         this._rol = value;
     }
 }
+
