@@ -12,7 +12,7 @@ import {Role} from "./roles.enum";
 export class UsersService {
     constructor(
         @InjectRepository(UserEntity)
-        private userRepository: Repository<UserEntity>,
+        private readonly userRepository: Repository<UserEntity>,
     ) {}
 
     async login(loginDto: LoginDto) {

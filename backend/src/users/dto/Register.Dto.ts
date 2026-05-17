@@ -1,4 +1,5 @@
 import { IsEmail, IsString, MinLength } from 'class-validator';
+import {Role} from "../roles.enum";
 
 export class RegisterDto {
 
@@ -21,6 +22,6 @@ export class RegisterDto {
     @MinLength(7)
     telefono: string;
 
-    rol: "usuario";
+    rol: Role;
 
 }

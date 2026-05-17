@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { PublicationsModule } from './publications/publications.module';
 
 @Module({
 
@@ -19,6 +20,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       //nest crea las tabla automaticamente
       synchronize: true, // ⚠️ solo desarrollo
     }),
+    UsersModule,
+    PublicationsModule,
   ],
+
 })
 export class AppModule {}
