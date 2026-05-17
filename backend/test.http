@@ -1,0 +1,24 @@
+POST http://localhost:3000/users/register
+Content-Type: application/json
+
+{
+  "name": "Franco",
+  "apellido": "Nuzzo",
+  "email": "test@test.com",
+  "password": "123456",
+  "telefono": "1234567",
+  "rol": "user"
+}
+
+### Crear publicación
+POST http://localhost:3000/publications
+Content-Type: application/json
+
+{
+  "name": "Paracetamol",
+  "lote": "L123",
+  "expirationDate": "2027-01-01",
+  "description": "Dolor de cabeza",
+  "type": "MEDICAMENTO",
+  "userId": 1
+}
