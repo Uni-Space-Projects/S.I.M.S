@@ -1,23 +1,22 @@
+import {Role} from "./roles.enum";
+
 export class Usuario {
     private _id: number;
     private _nombre:string
     private _apellido:string
     private _correo: string;
     private _contrasena: string;
-    //Al agregarle un ? despues de la variable el sistema lo trata como opcional
-    private _rol?: "administrador" | "usuario" | undefined;
+    private _rol: Role;
     private _telefono:string;
 
 
-    constructor(id: number, nombre: string, apellido: string, correo: string, contrasena: string, telefono: string, rol?: "administrador" | "usuario" | undefined) {
+    constructor(id: number, nombre: string, apellido: string, correo: string, contrasena: string, rol: Role, telefono: string) {
         this._id = id;
         this._nombre = nombre;
         this._apellido = apellido;
         this._correo = correo;
         this._contrasena = contrasena;
-        if (rol !== undefined){
-            this._rol = rol;
-        }
+        this._rol = rol;
         this._telefono = telefono;
     }
 
@@ -69,12 +68,11 @@ export class Usuario {
         this._telefono = value;
     }
 
-
-    get rol(): "administrador" | "usuario" | undefined {
+    get rol(): Role {
         return this._rol;
     }
 
-    set rol(value: "administrador" | "usuario" | undefined) {
+    set rol(value: Role) {
         this._rol = value;
     }
 }
