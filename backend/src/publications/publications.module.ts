@@ -9,7 +9,7 @@ import { UserEntity } from '../users/users.entity';
   imports: [
     TypeOrmModule.forFeature([Publication]),
   ],
-  controllers: [PublicationsController, PeneController],
+  controllers: [PublicationsController],
   providers: [PublicationsService],
 })
 export class PublicationsModule {}
