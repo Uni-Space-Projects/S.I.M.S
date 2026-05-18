@@ -4,12 +4,13 @@ import { PublicationsService } from './publications.service';
 import { PublicationsController } from './publications.controller';
 import { Publication } from './publications.entity';
 import { UserEntity } from '../users/users.entity';
+import { PeneController } from './pene/pene.controller';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Publication]),
   ],
-  controllers: [PublicationsController],
+  controllers: [PublicationsController, PeneController],
   providers: [PublicationsService],
 })
 export class PublicationsModule {}
