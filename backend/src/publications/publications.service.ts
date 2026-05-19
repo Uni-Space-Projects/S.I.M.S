@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {ILike, Repository} from 'typeorm';
 import { Publication } from './publications.entity';
 import { CreatePublicationDto } from './Dto/create-publication.dto';
 import { UpdatePublicationDto } from './Dto/update-publication.dto';
@@ -39,6 +39,24 @@ export class PublicationsService {
                 isActive: true,
             },
         });
+    }
+
+    // 🔵 OBTENER UNA POR NOMBRE
+    async findByInitialText(term: string) {
+        // @ts-ignore
+        const publications = await this.publicationRepository.find({
+            where: {
+                // 🔵 2. Lo aplicas aquí. Si 'term' es "hola", buscará "Hola", "HOLA", "hola", etc.
+                name: ILike(`${term}%`),
+            },
+        });
+
+        // @ts-ignore
+        if (publications.length === 0) {
+            throw new NotFoundException(`No se encontraron publicaciones`);
+        }
+
+        return publications;
     }
 
     // 🔵 OBTENER UNA POR ID
