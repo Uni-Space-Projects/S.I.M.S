@@ -22,3 +22,19 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
+
+
+
+# IDEs y Editores de texto
+.idea/
+*.iml
+.vscode/
+
+# Entornos de Agentes IA (Antigravity / MCPs)
+.antigravity/
+.cline/
+.cursor/
+.mcp/
+
+# Frontend (Next.js)
+.next/
