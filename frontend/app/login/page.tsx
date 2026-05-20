@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+    const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -32,13 +35,16 @@ export default function LoginPage() {
             if (data.success) {
                 setMessage("Inicio de sesión exitoso");
                 console.log("Usuario:", data.user);
+                setTimeout(() => {
+                    router.push("/publications");
+                }, 1500);
             } else {
                 setMessage(data.message || "Error al iniciar sesión");
+                setLoading(false);
             }
         } catch (error) {
             setMessage("No se pudo conectar con el servidor");
             console.error("Error en login:", error);
-        } finally {
             setLoading(false);
         }
     }
@@ -67,7 +73,7 @@ export default function LoginPage() {
                             placeholder="ejemplo@correo.com"
                             value={email}
                             onChange={(event) => setEmail(event.target.value)}
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 bg-white outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+                            className="w-full rounded-lg border text-black border-gray-300 px-4 py-3 bg-white outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
                             required
                         />
                     </div>
@@ -99,6 +105,13 @@ export default function LoginPage() {
                         {loading ? "Ingresando..." : "Entrar"}
                     </button>
                 </form>
+
+                <p className="mt-6 text-center text-sm text-gray-600">
+                    ¿No tienes cuenta?{" "}
+                    <Link href="/register" className="font-semibold text-blue-600 hover:text-blue-700">
+                        Regístrate aquí
+                    </Link>
+                </p>
 
                 {message && (
                     <p className="mt-5 text-center text-sm font-medium text-gray-700">
