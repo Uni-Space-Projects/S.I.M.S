@@ -1,0 +1,83 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "Módulo Raíz" {
+    class AppModule <<Module>> {
+    }
+}
+
+package "Módulo de Usuarios" {
+    enum Role {
+        ADMIN
+        USER
+        PUBLIC
+    }
+
+    class UsersController {
+        + login(body: LoginDto)
+        + register(body: RegisterDto)
+    }
+
+    class UsersService {
+        + login(loginDto: LoginDto)
+        + register(registerDto: RegisterDto)
+    }
+
+    class UserEntity {
+        + id: number
+        + nombre: string
+        + apellido: string
+        + email: string
+        + contrasena: string
+        + telefono: string
+        + rol: Role
+        + publications: Publication[]
+    }
+    
+    UsersController --> UsersService : "usa"
+    UsersService --> UserEntity : "gestiona"
+    UserEntity --> Role : "tiene"
+}
+
+package "Módulo de Publicaciones" {
+    class PublicationsController {
+        + create(dto: CreatePublicationDto)
+        + findAll()
+        + findByUser(userId: string)
+        + findOne(id: string)
+        + update(id: string, dto: UpdatePublicationDto)
+        + remove(id: string)
+    }
+
+    class PublicationsService {
+        + create(dto: CreatePublicationDto)
+        + findAll()
+        + findByUser(userId: number)
+        + findByInitialText(term: string)
+        + findOne(id: number)
+        + update(id: number, dto: UpdatePublicationDto)
+        + remove(id: number)
+    }
+
+    class Publication {
+        + id: number
+        + name: string
+        + lote: string
+        + expirationDate: Date
+        + description: string
+        + additionalInfo: string
+        + type: string
+        + isActive: boolean
+        + user: UserEntity
+    }
+
+    PublicationsController --> PublicationsService : "usa"
+    PublicationsService --> Publication : "gestiona"
+}
+
+AppModule --> UsersController : "importa"
+AppModule --> PublicationsController : "importa"
+
+Publication "n" --> "1" UserEntity : "user"
+@enduml
