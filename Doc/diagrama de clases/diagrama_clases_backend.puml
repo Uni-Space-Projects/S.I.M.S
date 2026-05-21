@@ -25,14 +25,14 @@ package "Módulo de Usuarios" {
     }
 
     class UserEntity {
-        + id: number
-        + nombre: string
-        + apellido: string
-        + email: string
-        + contrasena: string
-        + telefono: string
-        + rol: Role
-        + publications: Publication[]
+        - id: number
+        - nombre: string
+        - apellido: string
+        - email: string
+        - contrasena: string
+        - telefono: string
+        - rol: Role
+        - publications: Publication[]
     }
     
     UsersController --> UsersService : "usa"
@@ -61,15 +61,15 @@ package "Módulo de Publicaciones" {
     }
 
     class Publication {
-        + id: number
-        + name: string
-        + lote: string
-        + expirationDate: Date
-        + description: string
-        + additionalInfo: string
-        + type: string
-        + isActive: boolean
-        + user: UserEntity
+        - id: number
+        - name: string
+        - lote: string
+        - expirationDate: Date
+        - description: string
+        - additionalInfo: string
+        - type: string
+        - isActive: boolean
+        - user: UserEntity
     }
 
     PublicationsController --> PublicationsService : "usa"
