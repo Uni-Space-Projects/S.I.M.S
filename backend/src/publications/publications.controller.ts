@@ -21,6 +21,12 @@ export class PublicationsController {
         return this.publicationsService.findAll();
     }
 
+    // 🔵 OBTENER POR USUARIO
+    @Get('user/:userId')
+    findByUser(@Param('userId') userId: string) {
+        return this.publicationsService.findByUser(+userId);
+    }
+
     // 🔵 OBTENER POR ID
     @Get(':id')
     findOne(@Param('id') id: string) {
