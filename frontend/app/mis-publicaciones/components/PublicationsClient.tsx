@@ -1,22 +1,36 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PublicacionInsumo } from "../types";
 import PublicationCard from "./PublicationCard";
 import CreatePublicationModal from "./CreatePublicationModal";
 import PublicationDetailModal from "./PublicationDetailModal";
 import Link from "next/link";
 
-interface PublicationsClientProps {
-  initialPublications: PublicacionInsumo[];
-}
+export default function PublicationsClient() {
+  const [publications, setPublications] = useState<PublicacionInsumo[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-export default function PublicationsClient({
-  initialPublications,
-}: PublicationsClientProps) {
-  const [publications, setPublications] = useState<PublicacionInsumo[]>(
-    initialPublications
-  );
+  useEffect(() => {
+    const fetchUserPublications = async () => {
+      const storedUserId = localStorage.getItem("sims_user_id");
+      const userId = storedUserId ? parseInt(storedUserId, 10) : 1;
+
+      try {
+        const res = await fetch(`http://localhost:3000/publications/user/${userId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setPublications(data);
+        }
+      } catch (error) {
+        console.error("Error fetching user publications:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserPublications();
+  }, []);
 
   // Estados para Modal de Crear/Editar
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -165,12 +179,15 @@ export default function PublicationsClient({
             >
               Mis Publicaciones
             </Link>
-            <Link
-              href="#"
-              className="text-on-surface-variant hover:bg-surface-container-low transition-colors px-3 py-2 rounded-lg font-label-sm text-label-sm text-sm"
+            <button
+              onClick={() => {
+                localStorage.removeItem("sims_user_id");
+                window.location.href = "/login";
+              }}
+              className="text-error hover:bg-error-container hover:text-on-error-container transition-colors px-3 py-2 rounded-lg font-label-sm text-label-sm text-sm font-semibold cursor-pointer"
             >
-              Perfil
-            </Link>
+              Cerrar Sesión
+            </button>
           </div>
         </div>
       </nav>
@@ -196,7 +213,16 @@ export default function PublicationsClient({
         </header>
 
         {/* Publications Grid */}
-        {publications.length === 0 ? (
+        {isLoading ? (
+          <section className="flex flex-col items-center justify-center py-16 bg-surface-container-lowest border border-dashed border-outline-variant rounded-xl p-8 text-center">
+            <span className="material-symbols-outlined text-outline text-[48px] mb-4 animate-spin">
+              progress_activity
+            </span>
+            <h3 className="font-headline-md text-headline-md text-on-surface font-semibold text-lg">
+              Cargando tus publicaciones...
+            </h3>
+          </section>
+        ) : publications.length === 0 ? (
           <section className="flex flex-col items-center justify-center py-16 bg-surface-container-lowest border border-dashed border-outline-variant rounded-xl p-8 text-center">
             <span className="material-symbols-outlined text-outline text-[48px] mb-4">
               inventory_2

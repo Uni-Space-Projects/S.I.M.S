@@ -12,6 +12,9 @@ export default function PublicationCard({
 }: PublicationCardProps) {
   const { name, lote, expirationDate, isActive } = publication;
 
+  // Formatear la fecha para que no muestre la hora (ej. 2026-10-28T00:00:00.000Z -> 2026-10-28)
+  const formattedDate = expirationDate.split("T")[0];
+
   // Determinar si está vencido o a punto de vencer (comparar con la fecha actual del sistema)
   const isExpiredOrClose = () => {
     try {
@@ -52,7 +55,7 @@ export default function PublicationCard({
           </div>
           <div className="flex justify-between pt-1">
             <span>Vencimiento</span>
-            <span className="font-semibold text-on-surface">{expirationDate}</span>
+            <span className="font-semibold text-on-surface">{formattedDate}</span>
           </div>
         </div>
       </article>
@@ -83,7 +86,7 @@ export default function PublicationCard({
             <span>Vencimiento</span>
             <div className="flex items-center gap-1 text-error bg-error-container px-2 py-0.5 rounded text-sm">
               <span className="material-symbols-outlined text-[16px]">warning</span>
-              <span className="font-semibold">{expirationDate}</span>
+              <span className="font-semibold">{formattedDate}</span>
             </div>
           </div>
         </div>
@@ -111,7 +114,7 @@ export default function PublicationCard({
         </div>
         <div className="flex justify-between pt-1">
           <span>Vencimiento</span>
-          <span className="font-semibold text-on-surface">{expirationDate}</span>
+          <span className="font-semibold text-on-surface">{formattedDate}</span>
         </div>
       </div>
     </article>
