@@ -1,37 +1,68 @@
-@startuml
-'https://plantuml.com/activity-diagram-beta
+H3
 
+@startuml
+title act Editar o eliminar publicación de insumo médico
+
+|Usuario|
 start
-:ClickServlet.handleRequest();
-:new page;
-if (Page.onSecurityCheck) then (true)
-  :Page.onInit();
-  if (isForward?) then (no)
-    :Process controls;
-    if (continue processing?) then (no)
+:Iniciar sesión;
+:Acceder a "Mis publicaciones";
+:Seleccionar publicación propia;
+
+
+  |Usuario|
+  if (¿Qué acción desea realizar?) then (Editar)
+    :Modificar datos de la publicación;
+
+    |Sistema|
+    :Validar datos modificados;
+
+    if (¿Datos válidos?) then (Sí)
+      :Guardar cambios en base de datos;
+      :Actualizar publicación;
+      :Mostrar mensaje de actualización exitosa;
+      stop
+    else (No)
+      :Mostrar errores de validación;
+
+      |Usuario|
+      :Corregir datos;
       stop
     endif
 
-    if (isPost?) then (yes)
-      :Page.onPost();
-    else (no)
-      :Page.onGet();
+  else (Eliminar)
+    :Solicitar eliminación de publicación;
+
+    |Sistema|
+    :Solicitar confirmación de eliminación;
+
+    |Usuario|
+    if (¿Confirma eliminación?) then (Sí)
+
+      |Sistema|
+      :Verificar estado de la publicación;
+
+      if (¿Tiene transacción cerrada?) then (Sí)
+        :Impedir eliminación definitiva;
+        :Ocultar publicación del listado público;
+        :Conservar registro histórico;
+        :Mostrar mensaje de restricción;
+        stop
+      else (No)
+        :Eliminar publicación;
+        :Actualizar listado público;
+        :Mostrar mensaje de eliminación exitosa;
+        stop
+      endif
+
+    else (No)
+      :Cancelar operación;
+
+      |Sistema|
+      :Mantener publicación sin cambios;
+      stop
     endif
-    :Page.onRender();
   endif
-else (false)
-endif
 
-if (do redirect?) then (yes)
-  :redirect process;
-else
-  if (do forward?) then (yes)
-    :Forward request;
-  else (no)
-    :Render page template;
-  endif
-endif
-
-stop
 
 @enduml

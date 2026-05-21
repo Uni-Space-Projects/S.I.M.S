@@ -1,37 +1,48 @@
+H2
+
 @startuml
-'https://plantuml.com/activity-diagram-beta
+title act Crear publicación de insumo médico
 
+|Usuario|
 start
-:ClickServlet.handleRequest();
-:new page;
-if (Page.onSecurityCheck) then (true)
-  :Page.onInit();
-  if (isForward?) then (no)
-    :Process controls;
-    if (continue processing?) then (no)
-      stop
-    endif
+:Iniciar sesión;
+:Acceder al módulo de publicaciones;
+:Seleccionar "Crear publicación";
+:Ingresar datos del insumo;
 
-    if (isPost?) then (yes)
-      :Page.onPost();
-    else (no)
-      :Page.onGet();
-    endif
-    :Page.onRender();
+|Sistema|
+:Recibir datos de la publicación;
+:Validar campos obligatorios;
+
+if (¿Campos obligatorios completos?) then (Sí)
+  :Validar lote y fecha de vencimiento;
+
+  if (¿Fecha de vencimiento válida?) then (Sí)
+    :Asociar publicación al usuario creador;
+    :Guardar publicación en base de datos;
+    :Mostrar mensaje de publicación exitosa;
+
+    |Usuario|
+    :Visualizar publicación creada;
+
+    |Sistema|
+    :Mostrar publicación en listado de insumos disponibles;
+    stop
+
+  else (No)
+    :Mostrar error por fecha vencida o inválida;
+
+    |Usuario|
+    :Corregir fecha de vencimiento;
+    stop
   endif
-else (false)
-endif
 
-if (do redirect?) then (yes)
-  :redirect process;
-else
-  if (do forward?) then (yes)
-    :Forward request;
-  else (no)
-    :Render page template;
-  endif
-endif
+else (No)
+  :Mostrar mensaje de campos incompletos;
 
-stop
+  |Usuario|
+  :Completar información faltante;
+  stop
+endif
 
 @enduml

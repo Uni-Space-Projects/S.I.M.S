@@ -1,37 +1,57 @@
-@startuml
-'https://plantuml.com/activity-diagram-beta
+H4
 
+@startuml
+title act Visualizar y buscar insumos disponibles
+
+|Usuario|
 start
-:ClickServlet.handleRequest();
-:new page;
-if (Page.onSecurityCheck) then (true)
-  :Page.onInit();
-  if (isForward?) then (no)
-    :Process controls;
-    if (continue processing?) then (no)
+:Acceder a la aplicación web;
+:Ingresar al catálogo de insumos disponibles;
+
+|Sistema|
+:Consultar publicaciones activas;
+:Mostrar listado de insumos disponibles;
+
+|Usuario|
+if (¿Desea buscar o filtrar?) then (Sí)
+  :Ingresar nombre o seleccionar categoría;
+
+  |Sistema|
+  :Aplicar criterios de búsqueda;
+  :Consultar publicaciones coincidentes;
+
+  if (¿Existen resultados?) then (Sí)
+    :Mostrar resultados filtrados;
+
+    |Usuario|
+    :Seleccionar insumo del listado;
+
+    |Sistema|
+    :Mostrar detalle completo del insumo;
+    stop
+
+  else (No)
+    :Mostrar mensaje "No hay resultados coincidentes";
+
+    |Usuario|
+    if (¿Desea intentar otra búsqueda?) then (Sí)
+      :Modificar criterios de búsqueda;
+
+      |Sistema|
+      :Aplicar nuevos criterios;
+      stop
+    else (No)
+      :Finalizar búsqueda;
       stop
     endif
-
-    if (isPost?) then (yes)
-      :Page.onPost();
-    else (no)
-      :Page.onGet();
-    endif
-    :Page.onRender();
   endif
-else (false)
-endif
 
-if (do redirect?) then (yes)
-  :redirect process;
-else
-  if (do forward?) then (yes)
-    :Forward request;
-  else (no)
-    :Render page template;
-  endif
-endif
+else (No)
+  :Seleccionar insumo del listado general;
 
-stop
+  |Sistema|
+  :Mostrar detalle completo del insumo;
+  stop
+endif
 
 @enduml
