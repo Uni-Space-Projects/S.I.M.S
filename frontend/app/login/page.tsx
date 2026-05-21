@@ -35,8 +35,14 @@ export default function LoginPage() {
             if (data.success) {
                 setMessage("Inicio de sesión exitoso");
                 console.log("Usuario:", data.user);
+                
+                // Guardar usuario en localStorage para las publicaciones
+                if (data.user && data.user.id) {
+                    localStorage.setItem("sims_user_id", data.user.id.toString());
+                }
+
                 setTimeout(() => {
-                    router.push("/publications");
+                    router.push("/inicio");
                 }, 1500);
             } else {
                 setMessage(data.message || "Error al iniciar sesión");
