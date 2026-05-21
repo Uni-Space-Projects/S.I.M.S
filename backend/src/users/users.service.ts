@@ -44,6 +44,7 @@ export class UsersService {
                 success: true,
                 message: 'Login correcto',
                 user: {
+                    id: user.id,
                     email: user.email
                 }
             };
@@ -95,6 +96,7 @@ export class UsersService {
             success: true,
             message: 'Usuario registrado correctamente',
             user: {
+                id: user.id,
                 email: user.email
             }
         };

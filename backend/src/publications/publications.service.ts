@@ -24,7 +24,7 @@ export class PublicationsService {
             ...dto,
             expirationDate: expiration,
             isActive: true,
-
+            user: { id: dto.userId },
         });
 
         return await this.publicationRepository.save(publication);
@@ -37,6 +37,16 @@ export class PublicationsService {
         return this.publicationRepository.find({
             where: {
                 isActive: true,
+            },
+        });
+    }
+
+    // 🔵 OBTENER TODAS POR USUARIO
+    async findByUser(userId: number) {
+        return this.publicationRepository.find({
+            where: {
+                isActive: true,
+                user: { id: userId }
             },
         });
     }
