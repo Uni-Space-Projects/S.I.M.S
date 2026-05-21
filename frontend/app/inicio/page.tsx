@@ -1,12 +1,11 @@
-"use client";
+import React from "react";
+import InicioClient from "./InicioClient";
 
-import { useState } from "react";
-import Link from "next/link";
+export const metadata = {
+  title: "Inicio - SIMS",
+  description: "Catálogo de insumos médicos disponibles para intercambio.",
+};
 
-export default function PublicationsPage() {
-
-    return (
-        <main className="min-h-screen flex items-center justify-center bg-linear-to-r from-emerald-800 via-emerald-500 to-emerald-300 px-4">
-        </main>
-);
+export default function InicioPage() {
+  return <InicioClient />;
 }
