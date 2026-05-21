@@ -7,8 +7,9 @@ interface PublicationDetailModalProps {
   publication: PublicacionInsumo | null;
   isOpen: boolean;
   onClose: () => void;
-  onEdit: (pub: PublicacionInsumo) => void;
-  onDelete: (id: number) => void;
+  onEdit?: (pub: PublicacionInsumo) => void;
+  onDelete?: (id: number) => void;
+  readOnly?: boolean;
 }
 
 export default function PublicationDetailModal({
@@ -17,6 +18,7 @@ export default function PublicationDetailModal({
   onClose,
   onEdit,
   onDelete,
+  readOnly = false,
 }: PublicationDetailModalProps) {
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 
@@ -140,7 +142,7 @@ export default function PublicationDetailModal({
               </button>
               <button
                 onClick={() => {
-                  onDelete(publication.id);
+                  if (onDelete) onDelete(publication.id);
                   onClose();
                 }}
                 className="px-5 py-2.5 rounded-lg border border-error bg-error text-on-error font-label-sm text-label-sm font-semibold hover:bg-[#B3261E] transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
@@ -159,7 +161,7 @@ export default function PublicationDetailModal({
               >
                 Volver
               </button>
-              {isActive && (
+              {isActive && !readOnly && onEdit && onDelete && (
                 <>
                   <button
                     onClick={() => {
