@@ -1,37 +1,62 @@
+H1
+
 @startuml
-'https://plantuml.com/activity-diagram-beta
+title act Gestionar acceso del usuario
 
+|Usuario|
 start
-:ClickServlet.handleRequest();
-:new page;
-if (Page.onSecurityCheck) then (true)
-  :Page.onInit();
-  if (isForward?) then (no)
-    :Process controls;
-    if (continue processing?) then (no)
-      stop
-    endif
+:Acceder a la aplicación web;
 
-    if (isPost?) then (yes)
-      :Page.onPost();
-    else (no)
-      :Page.onGet();
-    endif
-    :Page.onRender();
+if (¿Tiene cuenta registrada?) then (No)
+  :Seleccionar opción "Registrarse";
+  :Ingresar datos de registro;
+
+  |Sistema|
+  :Validar datos ingresados;
+
+  if (¿Datos válidos y correo disponible?) then (Sí)
+    :Crear cuenta de usuario;
+    :Guardar usuario en base de datos;
+    :Mostrar mensaje de registro exitoso;
+
+    |Usuario|
+    :Seleccionar opción "Iniciar sesión";
+  else (No)
+    :Mostrar errores de validación;
+
+    |Usuario|
+    :Corregir datos de registro;
+    stop
   endif
-else (false)
+
+else (Sí)
+  :Seleccionar opción "Iniciar sesión";
 endif
 
-if (do redirect?) then (yes)
-  :redirect process;
-else
-  if (do forward?) then (yes)
-    :Forward request;
-  else (no)
-    :Render page template;
-  endif
-endif
+|Usuario|
+:Ingresar correo y contraseña;
 
-stop
+|Sistema|
+:Validar credenciales;
+
+if (¿Credenciales válidas?) then (Sí)
+  :Crear sesión de usuario;
+  :Redirigir al panel principal;
+
+  |Usuario|
+  :Seleccionar opción "Cerrar sesión";
+
+  |Sistema|
+  :Invalidar sesión;
+
+  stop
+
+else (No)
+  :Mostrar mensaje de credenciales inválidas;
+
+  |Usuario|
+  :Reintentar inicio de sesión;
+  stop
+endif
 
 @enduml
