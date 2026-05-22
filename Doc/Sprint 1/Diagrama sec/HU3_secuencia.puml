@@ -7,42 +7,59 @@ participant "PublicationsController" as Controller
 participant "PublicationsService" as Service
 database "Publication \n (PostgreSQL)" as DB
 
-== Editar Publicación ==
-User -> Client: Edita información de la publicación
-Client -> Controller: PUT /publications/:id (UpdatePublicationDto)
-Controller -> Service: update(id, dto)
-
-Service -> Service: findOne(id)
-Service -> DB: findOne({ where: { id } })
-DB --> Service: publication (estado actual)
-
-alt si se envía expirationDate
-    Service -> Service: Validar (expirationDate > fecha actual)
+group Editar Publicación
+    User -> Client: Edita información de la publicación
+    Client -> Controller: update(id, UpdatePublicationDto)
+    Controller -> Service: update(id, dto)
+    
+    Service -> Service: findOne(id)
+    Service -> DB: findOne({ where: { id } })
+    DB --> Service: result
+    
+    alt [Publicación no encontrada]
+        Service --> Controller: NotFoundException
+        Controller --> Client: Error (404 Not Found)
+        Client --> User: Muestra error
+    else [Publicación encontrada]
+        opt [Se envía expirationDate]
+            Service -> Service: Validar (expirationDate > fecha actual)
+            alt [Fecha inválida]
+                Service --> Controller: Error (Exception)
+                Controller --> Client: Error (400 Bad Request)
+            end
+        end
+        
+        Service -> DB: save(publication actualizada)
+        DB --> Service: publication guardada
+        
+        Service --> Controller: publication
+        Controller --> Client: Response (Éxito)
+        Client --> User: Muestra mensaje "Publicación actualizada"
+    end
 end
 
-Service -> DB: save(publication actualizada)
-DB --> Service: publication guardada
-
-Service --> Controller: publication
-Controller --> Client: Response (Éxito)
-Client --> User: Muestra mensaje "Publicación actualizada"
-
-== Eliminar Publicación (Soft Delete) ==
-User -> Client: Selecciona opción "Eliminar"
-Client -> Controller: DELETE /publications/:id
-Controller -> Service: remove(id)
-
-Service -> Service: findOne(id)
-Service -> DB: findOne({ where: { id } })
-DB --> Service: publication
-
-Service -> Service: publication.isActive = false
-
-Service -> DB: save(publication)
-DB --> Service: publication (inactiva)
-
-Service --> Controller: publication
-Controller --> Client: Response (Éxito)
-Client --> User: Muestra mensaje "Publicación eliminada"
+group Eliminar Publicación (Soft Delete)
+    User -> Client: Selecciona opción "Eliminar"
+    Client -> Controller: remove(id)
+    Controller -> Service: remove(id)
+    
+    Service -> Service: findOne(id)
+    Service -> DB: findOne({ where: { id } })
+    DB --> Service: result
+    
+    alt [Publicación no encontrada]
+        Service --> Controller: NotFoundException
+        Controller --> Client: Error (404 Not Found)
+        Client --> User: Muestra error
+    else [Publicación encontrada]
+        Service -> Service: publication.isActive = false
+        Service -> DB: save(publication)
+        DB --> Service: publication (inactiva)
+        
+        Service --> Controller: publication
+        Controller --> Client: Response (Éxito)
+        Client --> User: Muestra mensaje "Publicación eliminada"
+    end
+end
 
 @enduml
