@@ -102,7 +102,7 @@ export default function InicioClient() {
               medical_services
             </span>
             <span className="font-headline-md text-headline-md text-primary font-bold tracking-tight text-lg">
-              MediSwap
+              SIMS
             </span>
           </div>
           <div className="hidden md:flex items-center gap-8">
