@@ -1,11 +1,11 @@
-import {Injectable} from '@nestjs/common';
-import {LoginDto} from "./dto/Login.Dto";
-import {RegisterDto} from "./dto/Register.Dto";
-import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from 'typeorm';
-import {UserEntity} from './users.entity';
+import { Injectable } from '@nestjs/common';
+import { LoginDto } from "./dto/Login.Dto";
+import { RegisterDto } from "./dto/Register.Dto";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UserEntity } from './users.entity';
 import * as bcrypt from 'bcrypt';
-import {Role} from "./roles.enum";
+import { Role } from "./roles.enum";
 
 //Injectable significa que puedes usar esta clase en otras clases
 @Injectable()
@@ -13,7 +13,7 @@ export class UsersService {
     constructor(
         @InjectRepository(UserEntity)
         private readonly userRepository: Repository<UserEntity>,
-    ) {}
+    ) { }
 
     async login(loginDto: LoginDto) {
 
@@ -21,7 +21,7 @@ export class UsersService {
             where: { email: loginDto.email }
         });
 
-        if (!user){
+        if (!user) {
             return {
                 success: false,
                 message: 'Usuario no encontrado'
@@ -39,7 +39,7 @@ export class UsersService {
                 message: 'Credenciales incorrectas'
             };
         }
-        else{
+        else {
             return {
                 success: true,
                 message: 'Login correcto',
@@ -51,7 +51,7 @@ export class UsersService {
         }
 
         //if (user.rol === Role.ADMIN) {
-            //TODO:Funcionalidades agregadas si el usuario es admin.
+        //TODO:Funcionalidades agregadas si el usuario es admin.
         //}
     }
 

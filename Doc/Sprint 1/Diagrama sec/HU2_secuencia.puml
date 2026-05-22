@@ -8,8 +8,8 @@ participant "PublicationsService" as Service
 database "Publication \n (PostgreSQL)" as DB
 
 User -> Client: Llena formulario de publicación
-Client -> Controller: create(CreatePublicationDto)
-Controller -> Service: create(dto)
+Client -> Controller: create(body: JSON)
+Controller -> Service: create(CreatePublicationDto)
 
 Service -> Service: Validar (expirationDate > fecha actual)
 

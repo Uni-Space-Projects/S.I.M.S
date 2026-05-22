@@ -45,10 +45,10 @@ class PublicationsService {
 ' ---------------------------------------
 
 ' Los servicios gestionan a las entidades (Asociación Simple)
-UsersService "1" --> "1" UserEntity : gestiona >
-PublicationsService "1" --> "0..*" Publication : gestiona >
+UsersService "1" --> "1" UserEntity : gestiona
+PublicationsService "1" --> "0..*" Publication : gestiona
 
 ' Relación de Agregación: Un usuario agrupa/tiene muchas publicaciones
-UserEntity "1" o-- "0..*" Publication : publica >
+UserEntity "1" o-- "0..*" Publication : publica
 
 @enduml
