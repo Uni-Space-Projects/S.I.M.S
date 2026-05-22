@@ -1,0 +1,45 @@
+@startuml
+title Diagrama de Secuencia - HU1: Registro e Inicio de Sesión
+
+actor "Usuario" as User
+participant "Cliente (Frontend)" as Client
+participant "UsersController" as Controller
+participant "UsersService" as Service
+database "UserEntity \n (PostgreSQL)" as DB
+participant "bcrypt" as Bcrypt
+
+== Registro ==
+User -> Client: Ingresa datos de registro (name,apellido,email,password,telefono,rol)
+Client -> Controller: POST /users/register (RegisterDto)
+Controller -> Service: register(registerDto)
+
+Service -> DB: findOne({ email: registerDto.email })
+DB --> Service: null (no existe)
+
+Service -> Bcrypt: hash(password, 10)
+Bcrypt --> Service: hashedPassword
+
+Service -> DB: create({ id,nombre,apellido,email,contrasena,telefono, role, publications })
+Service -> DB: save(user)
+DB --> Service: user guardado
+
+Service --> Controller: { success: true, user }
+Controller --> Client: Response (Éxito)
+Client --> User: Muestra mensaje "Registro exitoso"
+
+== Inicio de Sesión ==
+User -> Client: Ingresa credenciales (email, contraseña)
+Client -> Controller: POST /users/login (LoginDto)
+Controller -> Service: login(loginDto)
+
+Service -> DB: findOne({ email: loginDto.email })
+DB --> Service: user
+
+Service -> Bcrypt: compare(loginDto.password, user.contrasena)
+Bcrypt --> Service: true
+
+Service --> Controller: { success: true, user: { id, email } }
+Controller --> Client: Response (Éxito)
+Client --> User: Redirige al panel principal
+
+@enduml
