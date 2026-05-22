@@ -8,38 +8,58 @@ participant "UsersService" as Service
 database "UserEntity \n (PostgreSQL)" as DB
 participant "bcrypt" as Bcrypt
 
-== Registro ==
-User -> Client: Ingresa datos de registro (name,apellido,email,password,telefono,rol)
-Client -> Controller: POST /users/register (RegisterDto)
-Controller -> Service: register(registerDto)
+group Registro
+    User -> Client: Ingresa datos de registro
+    Client -> Controller: register(RegisterDto)
+    Controller -> Service: register(registerDto)
+    
+    Service -> DB: findOne({ email })
+    DB --> Service: result
+    
+    alt [Usuario ya existe]
+        Service --> Controller: { success: false, message }
+        Controller --> Client: Error (400 Bad Request)
+        Client --> User: Muestra error
+    else [Usuario no existe]
+        Service -> Bcrypt: hash(password, 10)
+        Bcrypt --> Service: hashedPassword
+        
+        Service -> DB: create(user)
+        Service -> DB: save(user)
+        DB --> Service: user guardado
+        
+        Service --> Controller: { success: true, user }
+        Controller --> Client: Response (Éxito)
+        Client --> User: Muestra mensaje "Registro exitoso"
+    end
+end
 
-Service -> DB: findOne({ email: registerDto.email })
-DB --> Service: null (no existe)
-
-Service -> Bcrypt: hash(password, 10)
-Bcrypt --> Service: hashedPassword
-
-Service -> DB: create({ id,nombre,apellido,email,contrasena,telefono, role, publications })
-Service -> DB: save(user)
-DB --> Service: user guardado
-
-Service --> Controller: { success: true, user }
-Controller --> Client: Response (Éxito)
-Client --> User: Muestra mensaje "Registro exitoso"
-
-== Inicio de Sesión ==
-User -> Client: Ingresa credenciales (email, contraseña)
-Client -> Controller: POST /users/login (LoginDto)
-Controller -> Service: login(loginDto)
-
-Service -> DB: findOne({ email: loginDto.email })
-DB --> Service: user
-
-Service -> Bcrypt: compare(loginDto.password, user.contrasena)
-Bcrypt --> Service: true
-
-Service --> Controller: { success: true, user: { id, email } }
-Controller --> Client: Response (Éxito)
-Client --> User: Redirige al panel principal
+group Inicio de Sesión
+    User -> Client: Ingresa credenciales
+    Client -> Controller: login(LoginDto)
+    Controller -> Service: login(loginDto)
+    
+    Service -> DB: findOne({ email })
+    DB --> Service: user
+    
+    alt [Usuario no existe]
+        Service --> Controller: { success: false, message }
+        Controller --> Client: Error (404 Not Found)
+        Client --> User: Muestra error
+    else [Usuario existe]
+        Service -> Bcrypt: compare(password, user.contrasena)
+        Bcrypt --> Service: match
+        
+        alt [Password incorrecto]
+            Service --> Controller: { success: false, message }
+            Controller --> Client: Error (401 Unauthorized)
+            Client --> User: Muestra error de credenciales
+        else [Password correcto]
+            Service --> Controller: { success: true, user }
+            Controller --> Client: Response (Éxito)
+            Client --> User: Redirige al panel principal
+        end
+    end
+end
 
 @enduml

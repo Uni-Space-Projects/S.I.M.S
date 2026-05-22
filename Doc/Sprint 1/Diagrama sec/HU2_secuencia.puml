@@ -7,17 +7,17 @@ participant "PublicationsController" as Controller
 participant "PublicationsService" as Service
 database "Publication \n (PostgreSQL)" as DB
 
-User -> Client: Llena formulario de publicación (lote, fecha vencimiento...)
-Client -> Controller: POST /publications (CreatePublicationDto)
+User -> Client: Llena formulario de publicación
+Client -> Controller: create(CreatePublicationDto)
 Controller -> Service: create(dto)
 
 Service -> Service: Validar (expirationDate > fecha actual)
 
-alt Fecha inválida (pasada)
-    Service --> Controller: Error: "La fecha de vencimiento no puede ser pasada"
-    Controller --> Client: Response Error
+alt [Fecha inválida (pasada)]
+    Service --> Controller: Error (Exception)
+    Controller --> Client: Error (400 Bad Request)
     Client --> User: Muestra error de validación
-else Fecha válida
+else [Fecha válida]
     Service -> DB: create({ ..., expirationDate, isActive: true, user: dto.userId })
     Service -> DB: save(publication)
     DB --> Service: publication guardada
