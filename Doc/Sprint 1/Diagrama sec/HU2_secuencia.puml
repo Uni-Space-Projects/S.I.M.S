@@ -1,0 +1,30 @@
+@startuml
+title Diagrama de Secuencia - HU2: Crear publicaciones de insumos médicos
+
+actor "Usuario" as User
+participant "Cliente (Frontend)" as Client
+participant "PublicationsController" as Controller
+participant "PublicationsService" as Service
+database "Publication \n (PostgreSQL)" as DB
+
+User -> Client: Llena formulario de publicación (lote, fecha vencimiento...)
+Client -> Controller: POST /publications (CreatePublicationDto)
+Controller -> Service: create(dto)
+
+Service -> Service: Validar (expirationDate > fecha actual)
+
+alt Fecha inválida (pasada)
+    Service --> Controller: Error: "La fecha de vencimiento no puede ser pasada"
+    Controller --> Client: Response Error
+    Client --> User: Muestra error de validación
+else Fecha válida
+    Service -> DB: create({ ..., expirationDate, isActive: true, user: dto.userId })
+    Service -> DB: save(publication)
+    DB --> Service: publication guardada
+    
+    Service --> Controller: publication
+    Controller --> Client: Response (Éxito)
+    Client --> User: Muestra mensaje "Publicación creada con éxito"
+end
+
+@enduml

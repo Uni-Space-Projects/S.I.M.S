@@ -1,0 +1,58 @@
+@startuml
+title Diagrama de Secuencia - HU4: Visualizar y buscar insumos disponibles
+
+actor "Usuario" as User
+participant "Cliente (Frontend)" as Client
+participant "PublicationsController" as Controller
+participant "PublicationsService" as Service
+database "Publication \n (PostgreSQL)" as DB
+
+== Ver Todas las Publicaciones ==
+User -> Client: Accede al menú de insumos disponibles
+Client -> Controller: GET /publications
+Controller -> Service: findAll()
+
+Service -> DB: find({ where: { isActive: true } })
+DB --> Service: lista de publicaciones activas
+
+Service --> Controller: array de publications
+Controller --> Client: Response con array
+Client --> User: Muestra listado de insumos
+
+== Buscar por Nombre (Filtro) ==
+User -> Client: Escribe nombre en el buscador
+Client -> Controller: Llamado a ruta de búsqueda (ej. usando findByInitialText)
+Controller -> Service: findByInitialText(term)
+
+Service -> DB: find({ where: { name: ILike(...) } })
+DB --> Service: publicaciones filtradas
+
+Service --> Controller: array de publications
+Controller --> Client: Response
+Client --> User: Muestra resultados de la búsqueda
+
+== Ver Detalle de Publicación ==
+User -> Client: Hace clic en una publicación
+Client -> Controller: GET /publications/:id
+Controller -> Service: findOne(id)
+
+Service -> DB: findOne({ where: { id } })
+DB --> Service: publication
+
+Service --> Controller: publication
+Controller --> Client: Response
+Client --> User: Muestra vista detallada del insumo
+
+== Ver Mis Publicaciones ==
+User -> Client: Accede a 'Mis Publicaciones'
+Client -> Controller: GET /publications/user/:userId
+Controller -> Service: findByUser(userId)
+
+Service -> DB: find({ where: { isActive: true, user: { id: userId } } })
+DB --> Service: lista de publicaciones del usuario
+
+Service --> Controller: array de publications
+Controller --> Client: Response
+Client --> User: Muestra las publicaciones creadas por el usuario
+
+@enduml
