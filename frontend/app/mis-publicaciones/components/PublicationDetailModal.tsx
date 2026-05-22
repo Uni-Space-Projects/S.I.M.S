@@ -31,6 +31,9 @@ export default function PublicationDetailModal({
 
   const { name, lote, expirationDate, description, isActive } = publication;
 
+  // Formatear la fecha para remover la hora ISO (YYYY-MM-DD)
+  const formattedDate = typeof expirationDate === 'string' ? expirationDate.split("T")[0] : expirationDate;
+
   return (
     <div
       className="fixed inset-0 z-40 bg-on-background/10 backdrop-blur-[12px] transition-opacity duration-300 flex items-center justify-center p-margin-mobile md:p-margin-desktop"
@@ -107,7 +110,7 @@ export default function PublicationDetailModal({
                 </span>
               </div>
               <span className="font-body-lg text-body-lg text-on-surface font-semibold">
-                {expirationDate}
+                {formattedDate}
               </span>
             </div>
           </div>
