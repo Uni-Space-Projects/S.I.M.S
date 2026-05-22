@@ -37,13 +37,13 @@ package "Módulo de Usuarios" {
     }
     
     ' Composición: El módulo controla el ciclo de vida de sus componentes
-    UsersModule "1" *-- "1" UsersController : declara >
-    UsersModule "1" *-- "1" UsersService : provee >
+    UsersModule "1" *-- "1" UsersController : declara
+    UsersModule "1" *-- "1" UsersService : provee
     
     ' Asociación: El controlador usa el servicio
-    UsersController "1" --> "1" UsersService : usa >
-    UsersService "1" --> "1" UserEntity : gestiona >
-    UserEntity "1" --> "1" Role : tiene >
+    UsersController "1" --> "1" UsersService : usa
+    UsersService "1" --> "1" UserEntity : gestiona
+    UserEntity "1" --> "1" Role : tiene
 }
 
 package "Módulo de Publicaciones" {
@@ -82,19 +82,19 @@ package "Módulo de Publicaciones" {
     }
 
     ' Composición
-    PublicationsModule "1" *-- "1" PublicationsController : declara >
-    PublicationsModule "1" *-- "1" PublicationsService : provee >
+    PublicationsModule "1" *-- "1" PublicationsController : declara
+    PublicationsModule "1" *-- "1" PublicationsService : provee
     
     ' Asociación
-    PublicationsController "1" --> "1" PublicationsService : usa >
-    PublicationsService "1" --> "0..*" Publication : gestiona >
+    PublicationsController "1" --> "1" PublicationsService : usa
+    PublicationsService "1" --> "0..*" Publication : gestiona
 }
 
 ' Agregación: El módulo raíz agrupa a los módulos hijos
-AppModule "1" o-- "1" UsersModule : importa >
-AppModule "1" o-- "1" PublicationsModule : importa >
+AppModule "1" o-- "1" UsersModule : importa
+AppModule "1" o-- "1" PublicationsModule : importa
 
 ' Agregación: Un usuario agrupa publicaciones
-UserEntity "1" o-- "0..*" Publication : publica >
+UserEntity "1" o-- "0..*" Publication : publica
 
 @enduml
