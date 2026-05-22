@@ -9,8 +9,8 @@ database "Publication \n (PostgreSQL)" as DB
 
 group Editar Publicación
     User -> Client: Edita información de la publicación
-    Client -> Controller: update(id, UpdatePublicationDto)
-    Controller -> Service: update(id, dto)
+    Client -> Controller: update(id, body: JSON)
+    Controller -> Service: update(id, UpdatePublicationDto)
     
     Service -> Service: findOne(id)
     Service -> DB: findOne({ where: { id } })

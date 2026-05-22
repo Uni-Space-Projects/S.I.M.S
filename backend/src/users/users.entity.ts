@@ -1,6 +1,6 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Role } from './roles.enum';
-import {Publication} from "../publications/publications.entity";
+import { Publication } from "../publications/publications.entity";
 
 @Entity()
 export class UserEntity {

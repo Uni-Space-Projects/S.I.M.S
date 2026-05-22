@@ -20,22 +20,44 @@ group Ver Todas las Publicaciones
     Client --> User: Muestra listado de insumos
 end
 
-group Buscar por Nombre (Filtro)
-    User -> Client: Escribe nombre en el buscador
-    Client -> Controller: findByInitialText(term)
-    Controller -> Service: findByInitialText(term)
+group Buscar o Filtrar Publicaciones
+    User -> Client: Selecciona criterios de búsqueda
     
-    Service -> DB: find({ where: { name: ILike(...) } })
-    DB --> Service: array
-    
-    alt [array vacío]
-        Service --> Controller: NotFoundException
-        Controller --> Client: Error (404 Not Found)
-        Client --> User: Muestra mensaje "No se encontraron publicaciones"
-    else [array con resultados]
-        Service --> Controller: array de publications
-        Controller --> Client: Response
-        Client --> User: Muestra resultados de la búsqueda
+    alt [Búsqueda por Nombre]
+        User -> Client: Escribe nombre en el buscador
+        Client -> Controller: findByInitialText(term)
+        Controller -> Service: findByInitialText(term)
+        
+        Service -> DB: find({ where: { name: ILike(...) } })
+        DB --> Service: array
+        
+        alt [array vacío]
+            Service --> Controller: NotFoundException
+            Controller --> Client: Error (404 Not Found)
+            Client --> User: Muestra mensaje "No se encontraron publicaciones"
+        else [array con resultados]
+            Service --> Controller: array de publications
+            Controller --> Client: Response
+            Client --> User: Muestra resultados de la búsqueda
+        end
+        
+    else [Búsqueda por Filtro de Categoría]
+        User -> Client: Selecciona tipos/categorías de insumos
+        Client -> Controller: filterByTypes(body: JSON)
+        Controller -> Service: filterByTypes(types)
+        
+        Service -> DB: find({ where: { type: In(types) } })
+        DB --> Service: array
+        
+        alt [array vacío]
+            Service --> Controller: NotFoundException
+            Controller --> Client: Error (404 Not Found)
+            Client --> User: Muestra mensaje "No se encontraron publicaciones"
+        else [array con resultados]
+            Service --> Controller: array de publications
+            Controller --> Client: Response
+            Client --> User: Muestra resultados filtrados
+        end
     end
 end
 
@@ -56,19 +78,6 @@ group Ver Detalle de Publicación
         Controller --> Client: Response
         Client --> User: Muestra vista detallada del insumo
     end
-end
-
-group Ver Mis Publicaciones
-    User -> Client: Accede a 'Mis Publicaciones'
-    Client -> Controller: findByUser(userId)
-    Controller -> Service: findByUser(userId)
-    
-    Service -> DB: find({ where: { isActive: true, user: { id: userId } } })
-    DB --> Service: array
-    
-    Service --> Controller: array de publications
-    Controller --> Client: Response
-    Client --> User: Muestra las publicaciones creadas por el usuario
 end
 
 @enduml

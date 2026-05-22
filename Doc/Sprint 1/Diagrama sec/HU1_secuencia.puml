@@ -8,35 +8,9 @@ participant "UsersService" as Service
 database "UserEntity \n (PostgreSQL)" as DB
 participant "bcrypt" as Bcrypt
 
-group Registro
-    User -> Client: Ingresa datos de registro
-    Client -> Controller: register(RegisterDto)
-    Controller -> Service: register(registerDto)
-    
-    Service -> DB: findOne({ email })
-    DB --> Service: result
-    
-    alt [Usuario ya existe]
-        Service --> Controller: { success: false, message }
-        Controller --> Client: Error (400 Bad Request)
-        Client --> User: Muestra error
-    else [Usuario no existe]
-        Service -> Bcrypt: hash(password, 10)
-        Bcrypt --> Service: hashedPassword
-        
-        Service -> DB: create(user)
-        Service -> DB: save(user)
-        DB --> Service: user guardado
-        
-        Service --> Controller: { success: true, user }
-        Controller --> Client: Response (Éxito)
-        Client --> User: Muestra mensaje "Registro exitoso"
-    end
-end
-
 group Inicio de Sesión
     User -> Client: Ingresa credenciales
-    Client -> Controller: login(LoginDto)
+    Client -> Controller: login(body: JSON)
     Controller -> Service: login(loginDto)
     
     Service -> DB: findOne({ email })
@@ -59,6 +33,32 @@ group Inicio de Sesión
             Controller --> Client: Response (Éxito)
             Client --> User: Redirige al panel principal
         end
+    end
+end
+
+group Registro
+    User -> Client: Selecciona "Registrarse" e ingresa datos
+    Client -> Controller: register(body: JSON)
+    Controller -> Service: register(registerDto)
+    
+    Service -> DB: findOne({ email })
+    DB --> Service: result
+    
+    alt [Usuario ya existe]
+        Service --> Controller: { success: false, message }
+        Controller --> Client: Error (400 Bad Request)
+        Client --> User: Muestra error
+    else [Usuario no existe]
+        Service -> Bcrypt: hash(password, 10)
+        Bcrypt --> Service: hashedPassword
+        
+        Service -> DB: create(user)
+        Service -> DB: save(user)
+        DB --> Service: user guardado
+        
+        Service --> Controller: { success: true, user }
+        Controller --> Client: Response (Éxito)
+        Client --> User: Muestra mensaje "Registro exitoso"
     end
 end
 
