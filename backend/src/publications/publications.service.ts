@@ -1,112 +1,110 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {ILike, Repository} from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { Publication } from './publications.entity';
 import { CreatePublicationDto } from './Dto/create-publication.dto';
 import { UpdatePublicationDto } from './Dto/update-publication.dto';
 
 @Injectable()
 export class PublicationsService {
-    constructor(
-        @InjectRepository(Publication)
-        private readonly publicationRepository: Repository<Publication>,
-    ) {}
+  constructor(
+    @InjectRepository(Publication)
+    private readonly publicationRepository: Repository<Publication>,
+  ) {}
 
-    // 🔵 CREAR PUBLICACIÓN
-    async create(dto: CreatePublicationDto) {
-        const expiration = new Date(dto.expirationDate);
+  // 🔵 CREAR PUBLICACIÓN
+  async create(dto: CreatePublicationDto) {
+    const expiration = new Date(dto.expirationDate);
 
-        if (expiration <= new Date()) {
-            throw new Error('La fecha de vencimiento no puede ser pasada');
-        }
-
-        const publication = this.publicationRepository.create({
-            ...dto,
-            expirationDate: expiration,
-            isActive: true,
-            user: { id: dto.userId },
-        });
-
-        return await this.publicationRepository.save(publication);
+    if (expiration <= new Date()) {
+      throw new Error('La fecha de vencimiento no puede ser pasada');
     }
 
-    // 🔵 OBTENER TODAS (solo activas y no vencidas)
-    async findAll() {
-        const today = new Date();
+    const publication = this.publicationRepository.create({
+      ...dto,
+      expirationDate: expiration,
+      isActive: true,
+      user: { id: dto.userId },
+    });
 
-        return this.publicationRepository.find({
-            where: {
-                isActive: true,
-            },
-        });
+    return await this.publicationRepository.save(publication);
+  }
+
+  // 🔵 OBTENER TODAS (solo activas y no vencidas)
+  async findAll() {
+    return this.publicationRepository.find({
+      where: {
+        isActive: true,
+      },
+    });
+  }
+
+  // 🔵 OBTENER TODAS POR USUARIO
+  async findByUser(userId: number) {
+    return this.publicationRepository.find({
+      where: {
+        isActive: true,
+        user: { id: userId },
+      },
+    });
+  }
+
+  // 🔵 OBTENER UNA POR NOMBRE
+  async findByInitialText(term: string) {
+    // @ts-expect-error: tipado typeorm
+    const publications = await this.publicationRepository.find({
+      where: {
+        // 🔵 2. Lo aplicas aquí. Si 'term' es "hola", buscará "Hola", "HOLA", "hola", etc.
+        name: ILike(`${term}%`),
+      },
+    });
+
+    // @ts-expect-error: array checks
+    if (publications.length === 0) {
+      throw new NotFoundException(`No se encontraron publicaciones`);
     }
 
-    // 🔵 OBTENER TODAS POR USUARIO
-    async findByUser(userId: number) {
-        return this.publicationRepository.find({
-            where: {
-                isActive: true,
-                user: { id: userId }
-            },
-        });
+    return publications;
+  }
+
+  // 🔵 OBTENER UNA POR ID
+  async findOne(id: number) {
+    const publication = await this.publicationRepository.findOne({
+      where: { id },
+    });
+
+    if (!publication) {
+      throw new NotFoundException('Publicación no encontrada');
     }
 
-    // 🔵 OBTENER UNA POR NOMBRE
-    async findByInitialText(term: string) {
-        // @ts-ignore
-        const publications = await this.publicationRepository.find({
-            where: {
-                // 🔵 2. Lo aplicas aquí. Si 'term' es "hola", buscará "Hola", "HOLA", "hola", etc.
-                name: ILike(`${term}%`),
-            },
-        });
+    return publication;
+  }
 
-        // @ts-ignore
-        if (publications.length === 0) {
-            throw new NotFoundException(`No se encontraron publicaciones`);
-        }
+  // 🔵 ACTUALIZAR
+  async update(id: number, dto: UpdatePublicationDto) {
+    const publication = await this.findOne(id);
 
-        return publications;
+    if (dto.expirationDate) {
+      const expiration = new Date(dto.expirationDate);
+
+      if (expiration <= new Date()) {
+        throw new Error('Fecha de vencimiento inválida');
+      }
+
+      publication.expirationDate = expiration;
     }
 
-    // 🔵 OBTENER UNA POR ID
-    async findOne(id: number) {
-        const publication = await this.publicationRepository.findOne({
-            where: { id },
-        });
+    Object.assign(publication, dto);
 
-        if (!publication) {
-            throw new NotFoundException('Publicación no encontrada');
-        }
+    return this.publicationRepository.save(publication);
+  }
 
-        return publication;
-    }
+  // 🔵 ELIMINAR (soft delete)
+  async remove(id: number) {
+    const publication = await this.findOne(id);
 
-    // 🔵 ACTUALIZAR
-    async update(id: number, dto: UpdatePublicationDto) {
-        const publication = await this.findOne(id);
+    publication.isActive = false;
 
-        if (dto.expirationDate) {
-            const expiration = new Date(dto.expirationDate);
-
-            if (expiration <= new Date()) {
-                throw new Error('Fecha de vencimiento inválida');
-            }
-
-            publication.expirationDate = expiration;
-        }
-
-        Object.assign(publication, dto);
-
-        return this.publicationRepository.save(publication);
-    }
-
-    // 🔵 ELIMINAR (soft delete)
-    async remove(id: number) {
-        const publication = await this.findOne(id);
-
-        publication.isActive = false;
-
-        return this.publicationRepository.save(publication);
-    }
+    return this.publicationRepository.save(publication);
+  }
 }
