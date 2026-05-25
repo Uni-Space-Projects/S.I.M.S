@@ -1,32 +1,38 @@
-import { IsNotEmpty, IsString, IsDateString, IsOptional, IsNumber } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsDateString,
+  IsOptional,
+  IsNumber,
+} from 'class-validator';
 
 export class CreatePublicationDto {
-    @IsNotEmpty()
-    @IsString()
-    name: string;
+  @IsNotEmpty()
+  @IsString()
+  name: string;
 
-    @IsNotEmpty()
-    @IsString()
-    lote: string;
+  @IsNotEmpty()
+  @IsString()
+  lote: string;
 
-    @IsNotEmpty()
-    @IsDateString()
-    expirationDate: string;
+  @IsNotEmpty()
+  @IsDateString()
+  expirationDate: string;
 
-    @IsNotEmpty()
-    @IsString()
-    description: string;
+  @IsNotEmpty()
+  @IsString()
+  description: string;
 
-    @IsOptional()
-    @IsString()
-    //Si se coloca un signo de pregunta a una variable dice que el atributo es opcional
-    additionalInfo?: string;
+  @IsOptional()
+  @IsString()
+  //Si se coloca un signo de pregunta a una variable dice que el atributo es opcional
+  additionalInfo?: string;
 
-    @IsNotEmpty()
-    @IsString()
-    type: string; //TODO: Hacer enumerate de esto (etiquetas para el motor de busqueda).
+  @IsNotEmpty()
+  @IsString()
+  type: string; //TODO: Hacer enumerate de esto (etiquetas para el motor de busqueda).
 
-    @IsNotEmpty()
-    @IsNumber()
-    userId: number;
+  @IsNotEmpty()
+  @IsNumber()
+  userId: number;
 }
