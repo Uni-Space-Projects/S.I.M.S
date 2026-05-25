@@ -56,12 +56,12 @@ export default function PublicationsClient() {
   };
 
   // Cerrar/Terminar el estado de una publicación (cambiar estado a CERRADO)
-  const handleCloseStatus = async (id: number) => {
-    // Por ahora solo lo actualizamos localmente, aunque idealmente haríamos un PUT aquí
-    setPublications((prev) =>
-      prev.map((pub) => (pub.id === id ? { ...pub, isActive: false } : pub))
-    );
-  };
+  // const handleCloseStatus = async (id: number) => {
+  //   // Por ahora solo lo actualizamos localmente, aunque idealmente haríamos un PUT aquí
+  //   setPublications((prev) =>
+  //     prev.map((pub) => (pub.id === id ? { ...pub, isActive: false } : pub))
+  //   );
+  // };
 
   // Eliminar una publicación
   const handleDelete = async (id: number) => {
