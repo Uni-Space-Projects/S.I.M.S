@@ -10,7 +10,7 @@ export class PublicationsService {
   constructor(
     @InjectRepository(Publication)
     private readonly publicationRepository: Repository<Publication>,
-  ) {}
+  ) { }
 
   // 🔵 CREAR PUBLICACIÓN
   async create(dto: CreatePublicationDto) {
@@ -51,7 +51,6 @@ export class PublicationsService {
 
   // 🔵 OBTENER UNA POR NOMBRE
   async findByInitialText(term: string) {
-    // @ts-expect-error: tipado typeorm
     const publications = await this.publicationRepository.find({
       where: {
         // 🔵 2. Lo aplicas aquí. Si 'term' es "hola", buscará "Hola", "HOLA", "hola", etc.
@@ -59,7 +58,7 @@ export class PublicationsService {
       },
     });
 
-    // @ts-expect-error: array checks
+
     if (publications.length === 0) {
       throw new NotFoundException(`No se encontraron publicaciones`);
     }
