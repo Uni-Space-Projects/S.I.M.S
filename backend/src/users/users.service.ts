@@ -13,7 +13,7 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-  ) {}
+  ) { }
 
   async login(loginDto: LoginDto) {
     const user = await this.userRepository.findOne({
@@ -26,7 +26,7 @@ export class UsersService {
         message: 'Usuario no encontrado',
       };
     }
-    // @ts-expect-error: bcrypt tipos
+
     const passwordMatch = await bcrypt.compare(
       loginDto.password,
       user.contrasena,
