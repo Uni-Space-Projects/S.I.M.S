@@ -21,10 +21,7 @@ export class UsersService {
     });
 
     if (!user) {
-      return {
-        success: false,
-        message: 'Usuario no encontrado',
-      };
+      throw new UnauthorizedException('Credenciales incorrectas');
     }
 
     const passwordMatch = await bcrypt.compare(
@@ -33,18 +30,11 @@ export class UsersService {
     );
 
     if (!passwordMatch) {
-      return {
-        success: false,
-        message: 'Credenciales incorrectas',
-      };
+      throw new UnauthorizedException ('Credenciales incorrectas');
     } else {
       return {
-        success: true,
-        message: 'Login correcto',
-        user: {
           id: user.id,
           email: user.email,
-        },
       };
     }
 
@@ -58,22 +48,16 @@ export class UsersService {
     const verificarEmail = emailPattern.test(registerDto.email);
 
     if (!verificarEmail) {
-      return {
-        success: false,
-        message: 'Correo electrónico no válido',
-      };
+      throw new UnauthorizedException('Credenciales incorrectas');
     }
 
-    // 🔍 verificar si ya existe
+    //  verificar si ya existe
     const userExists = await this.userRepository.findOne({
       where: { email: registerDto.email },
     });
 
     if (userExists) {
-      return {
-        success: false,
-        message: 'El usuario ya existe',
-      };
+      throw new ConflictException('El correo electrónico ya está registrado');
     }
 
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
@@ -90,12 +74,8 @@ export class UsersService {
     await this.userRepository.save(user);
 
     return {
-      success: true,
-      message: 'Usuario registrado correctamente',
-      user: {
-        id: user.id,
+      id: user.id,
         email: user.email,
-      },
     };
   }
 }
