@@ -32,7 +32,7 @@ export class PublicationsService {
 
   // 🔵 OBTENER TODAS (solo activas y no vencidas)
   async findAll() {
-    const publicaciones =  this.publicationRepository.find({
+    const publicaciones =  await this.publicationRepository.find({
       where: {
         isActive: true,
       },
@@ -47,7 +47,7 @@ export class PublicationsService {
 
   // 🔵 OBTENER TODAS POR USUARIO
   async findByUser(userId: number) {
-    const usurario = this.publicationRepository.find({
+    const usurario = await this.publicationRepository.find({
       where: {
         isActive: true,
         user: { id: userId },
