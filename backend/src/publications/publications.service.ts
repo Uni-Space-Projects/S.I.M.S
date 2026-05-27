@@ -32,21 +32,33 @@ export class PublicationsService {
 
   // 🔵 OBTENER TODAS (solo activas y no vencidas)
   async findAll() {
-    return this.publicationRepository.find({
+    const publicaciones =  this.publicationRepository.find({
       where: {
         isActive: true,
       },
     });
+
+    if (publicaciones.length === 0) {
+        throw new NotFoundException("No hay publicaciones creadas");
+    }
+
+    return publicaciones;
   }
 
   // 🔵 OBTENER TODAS POR USUARIO
   async findByUser(userId: number) {
-    return this.publicationRepository.find({
+    const usurario = this.publicationRepository.find({
       where: {
         isActive: true,
         user: { id: userId },
       },
     });
+
+    if (!usurario.length) {
+        throw new NotFoundException('Usuario no encontrado');
+    }
+
+    return usurario;
   }
 
   // 🔵 OBTENER UNA POR NOMBRE
