@@ -32,7 +32,7 @@ export default function LoginPage() {
 
             const data = await response.json();
 
-            if (data.success) {
+            if (response.ok) {
                 setMessage("Inicio de sesión exitoso");
                 console.log("Usuario:", data.user);
                 
