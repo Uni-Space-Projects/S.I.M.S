@@ -6,6 +6,8 @@ import { Repository } from 'typeorm';
 import { UserEntity } from './users.entity';
 import * as bcrypt from 'bcrypt';
 import { Role } from './roles.enum';
+import { UnauthorizedException } from '@nestjs/common';
+import { ConflictException } from '@nestjs/common';
 
 //Injectable significa que puedes usar esta clase en otras clases
 @Injectable()
