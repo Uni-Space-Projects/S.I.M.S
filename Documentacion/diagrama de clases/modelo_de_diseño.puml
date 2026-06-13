@@ -9,23 +9,23 @@ package "Módulo de Usuarios" {
     class UsersModule <<Module>> {
     }
 
-    enum Role {
+    enum Role <<Enumerate>>{
         ADMIN
         USER
         PUBLIC
     }
 
-    class UsersController {
+    class UsersController <<Controller>> {
         + login(body: LoginDto): Object
         + register(body: RegisterDto): Object
     }
 
-    class UsersService {
+    class UsersService <<Service>> {
         + login(loginDto: LoginDto): Object
         + register(registerDto: RegisterDto): Object
     }
 
-    class UserEntity {
+    class UserEntity <<Entity>> {
         - id{PK}: number
         - nombre: string
         - apellido: string
@@ -50,7 +50,7 @@ package "Módulo de Publicaciones" {
     class PublicationsModule <<Module>> {
     }
 
-    class PublicationsController {
+    class PublicationsController <<Controller>> {
         + create(dto: CreatePublicationDto): Object
         + findAll(): Object[]
         + findByUser(userId: string): Object[]
@@ -59,7 +59,7 @@ package "Módulo de Publicaciones" {
         + remove(id: string): Object
     }
 
-    class PublicationsService {
+    class PublicationsService <<Service>>{
         + create(dto: CreatePublicationDto): Publication
         + findAll(): Publication[]
         + findByUser(userId: number): Publication[]
@@ -69,7 +69,7 @@ package "Módulo de Publicaciones" {
         + remove(id: number): Publication
     }
 
-    class PublicationEntity {
+    class PublicationEntity <<Entity>> {
         - id{PK}: number
         - name: string
         - lote: string
