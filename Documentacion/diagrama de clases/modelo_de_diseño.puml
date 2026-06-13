@@ -12,7 +12,7 @@ package "Módulo de Usuarios" {
     enum Role <<Enumerate>>{
         ADMIN
         USER
-        PUBLIC
+        SUSPEND
     }
 
     class UsersController <<Controller>> {
@@ -69,7 +69,7 @@ package "Módulo de Publicaciones" {
         + remove(id: number): Publication
     }
 
-    class PublicationEntity <<Entity>> {
+    class Publication <<Entity>> {
         - id{PK}: number
         - name: string
         - lote: string
@@ -87,7 +87,7 @@ package "Módulo de Publicaciones" {
     
     ' Asociación
     PublicationsController "1" --> "1" PublicationsService : usa
-    PublicationsService ..> PublicationEntity : <<Instancia>>
+    PublicationsService ..> Publication : <<Instancia>>
 }
 
 ' Agregación: El módulo raíz agrupa a los módulos hijos
@@ -95,6 +95,6 @@ AppModule "1" o-- "1" UsersModule
 AppModule "1" o-- "1" PublicationsModule
 
 ' Agregación: Un usuario agrupa publicaciones
-UserEntity "1" o-- "0..*" PublicationEntity
+UserEntity "1" o-- "0..*" Publication
 
 @enduml
