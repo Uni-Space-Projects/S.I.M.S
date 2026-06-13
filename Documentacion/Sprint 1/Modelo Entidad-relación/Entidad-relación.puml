@@ -1,0 +1,24 @@
+@startuml
+
+hide empty members
+hide circle
+skinparam classBackgroundColor White
+skinparam classBorderColor Black
+
+entity "UserEntity" as entidad {}
+entity "Publicacion" as Publicacion {}
+
+entidad "1" -- "1" id
+entidad "1" -- "1" name
+entidad "1" -- "1" apellido
+entidad "1" -- "1" email
+entidad "1" -- "1" contrasena
+entidad "1" -- "1" telefono
+entidad "1" -- "1" tipo
+entidad "1" -- "1..*" Publicacion : "Crear publicacion >"
+
+tipo -- suspend
+tipo -- user
+tipo -- admin
+
+@enduml

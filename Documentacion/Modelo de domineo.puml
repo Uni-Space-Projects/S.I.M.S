@@ -1,0 +1,39 @@
+@startuml
+' Formato para los modelos de domineo
+hide empty members
+hide circle
+skinparam classBackgroundColor White
+skinparam classBorderColor Black
+
+' Definición de Conceptos
+class Usuario
+class Administrador
+class Publicacion
+class Insumo
+class Categoria
+class Solicitud
+class Transaccion
+class Calificacion
+class Reporte
+
+' Relaciones y Multiplicidades
+Usuario "1" -- "0..*" Publicacion : crea >
+Publicacion "1" -- "1" Insumo : contiene >
+Insumo "*" -- "1" Categoria : pertenece a >
+
+Usuario "1" -- "0..*" Solicitud : realiza >
+Solicitud "*" -- "1" Publicacion : asociada a >
+
+Transaccion "1" -- "0..2" Calificacion : recibe >
+Usuario "1" -- "0..*" Calificacion : posee >
+
+Solicitud "1" -- "0..1" Transaccion : genera >
+Transaccion "*" -- "1" Usuario : intercambia >
+
+Usuario "1" -- "0..*" Reporte : emite >
+Reporte "*" -- "1" Publicacion : señala >
+
+Administrador "1" -- "*" Reporte : revisa >
+Administrador "1" -- "*" Usuario : gestiona >
+
+@enduml
