@@ -187,7 +187,7 @@ package Transacciones {
      TransactionController "1" --> "1" TransactionService : usa
      TransactionService ..> TransactionEntity : <<Instancia>>
      TransactionEntity "1" --> "1" TransactionStatus : estado
-     TransactionEntity "1" *-- "1" detailTransactionEntity
+     TransactionEntity "1" --* "1" detailTransactionEntity
 
 }
 
@@ -199,5 +199,11 @@ AppModule "1" o-- "1" TransactionModule
 
 ' Agregación: Un usuario agrupa publicaciones
 UserEntity "1" o-- "0..*" Publication
-UserEntity "1" o-- "0..*" TransactionEntity
+UserEntity "1" o-- "0..*" detailTransactionEntity
+
+' Para mantener simplicidad cuando una publicacion tiene una transaccion no se pueden hacer mas transacciones.
+Publication "1" o-- "1" detailTransactionEntity
+UserEntity "1" o-- "0..*" ReportEntity
+Publication "1" o-- "0..*" ReportEntity
+
 @enduml
