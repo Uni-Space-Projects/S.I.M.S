@@ -10,6 +10,7 @@ erDiagram
         string email
         string contrasena
         string telefono
+        int qualification "Promedio de calificaciones recibidas"
         string rol "enum: admin, user, suspend"
     }
     
@@ -23,6 +24,7 @@ erDiagram
         date fecha_expiracion
         string descripcion
         string tipo
+        int cantidad
         boolean activa "Indica si está activa"
     }
     
@@ -44,3 +46,16 @@ erDiagram
         int publicacion_id FK "Clave foránea de PUBLICATION"
         int cantidad
     }
+
+    ReportesEntity {
+        int id PK
+        int usuario_reporta_id FK "Clave foránea de USER (quien reporta)"
+        int publicacion_id FK "Clave foránea de PUBLICATION"
+        string motivo
+        string estado "enum: pendiente, aceptado, rechazado"
+        date fecha_reporte
+    }
+
+    UserEntity ||--o{ ReportesEntity : "realiza >"
+    Publication ||--o{ ReportesEntity : "es reportada >"
+    
