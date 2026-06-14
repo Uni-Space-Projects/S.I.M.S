@@ -1,0 +1,203 @@
+@startuml
+
+package "Módulo Raíz" {
+    class AppModule <<Module>> {
+    }
+}
+
+package "Módulo de Usuarios" {
+    class UsersModule <<Module>> {
+    }
+
+    enum Role <<Enumerate>>{
+        ADMIN
+        USER
+        SUSPEND
+    }
+
+    class UsersController <<Controller>> {
+        + login(body: LoginDto): Object
+        + register(body: RegisterDto): Object
+        + findUser(userId: number): Publication[]
+    }
+
+    class UsersService <<Service>> {
+        + login(loginDto: LoginDto): Object
+        + register(registerDto: RegisterDto): Object
+        + findUser(userId: number): Publication[]
+    }
+
+    class UserEntity <<Entity>> {
+        - id{PK}: number
+        - nombre: string
+        - apellido: string
+        - email: string
+        - contrasena: string
+        - telefono: string
+        - rol: Role
+        - qualification: number
+        - publications: Publication[]
+    }
+
+    ' Composición: El módulo controla el ciclo de vida de sus componentes
+    UsersModule "1" *-- "1" UsersController
+    UsersModule "1" *-- "1" UsersService
+
+    ' Asociación: El controlador usa el servicio
+    UsersController "1" --> "1" UsersService : llama
+    UsersService ..> UserEntity : <<Instancia>>
+    UserEntity "1" --> "1" Role : tiene
+}
+
+package "Módulo de Publicaciones" {
+    class PublicationsModule <<Module>> {
+    }
+
+    class PublicationsController <<Controller>> {
+        + create(dto: CreatePublicationDto): Object
+        + findAll(): Object[]
+        + findByUser(userId: string): Object[]
+        + findOne(id: string): Object
+        + update(id: string, dto: UpdatePublicationDto): Object
+        + remove(id: string): Object
+    }
+
+    class PublicationsService <<Service>>{
+        + create(dto: CreatePublicationDto): Publication
+        + findAll(): Publication[]
+        + findByInitialText(term: string): Publication[]
+        + findOne(id: number): Publication
+        + update(id: number, dto: UpdatePublicationDto): Publication
+        + remove(id: number): Publication
+        + expirationDateAlert(publication: Publication): boolean
+        + changePublicationStatus(publication: Publication): Publication
+    }
+
+    class Publication <<Entity>> {
+        - id{PK}: number
+        - name: string
+        - lote: string
+        - cantidad: number
+        - expirationDate: Date
+        - description: string
+        - type: string
+        - isActive: boolean
+        - user: UserEntity
+    }
+
+    ' Composición
+    PublicationsModule "1" *-- "1" PublicationsController
+    PublicationsModule "1" *-- "1" PublicationsService
+
+    ' Asociación
+    PublicationsController "1" --> "1" PublicationsService : usa
+    PublicationsService ..> Publication : <<Instancia>>
+}
+
+package "Reportes"{
+
+    class ReportModule <<Module>> {}
+
+    class ReportController <<Controller>> {
+        + create(dto: CreateReportDto): Object
+        + acceptReport(id: int): Object
+        + rejectReport(id: int): Object
+        + ValidateReportStatus(id: int): Object
+    }
+
+    class ReportEntity <<Entity>> {
+        - id{PK}: number
+        - id_user {FK}: number
+        - id_publication {FK}: number
+        - reason: string
+        - status: string
+
+    }
+
+     class ReportService <<Service>> {
+            + create(dto: CreateReportDto): Object
+            + aceptReport(id: int): Object
+            + rejectReport(id: int): Object
+            + validateReportStatus(id: int): Object
+        }
+
+    enum ReportStatus <<Enumerate>> {
+        PENDING
+        ACCEPTED
+        REJECTED
+     }
+
+     ReportModule "1" *-- "1" ReportController
+     ReportModule "1" *-- "1" ReportService
+
+     ReportController "1" --> "1" ReportService : usa
+     ReportService ..> ReportEntity : <<Instancia>>
+     ReportEntity "1" --> "1" ReportStatus : estado
+}
+
+package Transacciones {
+    class TransactionModule <<Module>> {}
+
+    class TransactionController <<Controller>> {
+        + requestTransaction(dto_transaction: CreateTransactionDto, dto_detail: CreateTransactionDetailDto): Object
+        + validateTransactionStatus (id: int): TransactionStatus
+        + deleteTransaction(id: int): Void
+        + findTransactionsByUser(userId: int): TransactionEntity[]
+        + findTransactionsById(userId: int): TransactionEntity[]
+        + editTransactionStatus(id: int, status: TransactionStatus): TransactionEntity
+        + addRating(id_emisor: int, rating: number): Void
+        + validatePublicationQuantity (transaction: detailTransactionEntity, quantity: number): boolean
+    }
+
+    class TransactionService <<Service>> {
+        + requestTransaction(dto_transaction: CreateTransactionDto, dto_detail: CreateTransactionDetailDto): Object
+        + validateTransactionStatus (id: int): TransactionStatus
+        + deleteTransaction(id: int): Void
+        + findTransactionsByUser(userId: int): TransactionEntity[]
+        + findTransactionsById(userId: int): TransactionEntity[]
+        + editTransactionStatus(id: int, status: TransactionStatus): TransactionEntity
+        + addRating(id_emisor: int, rating: number): Void
+        + validatePublicationQuantity (transaction: detailTransactionEntity, quantity: number): boolean
+    }
+
+    class TransactionEntity <<Entity>> {
+        - id{PK}: number
+        - fecha_transaccion: Date
+        - estado: TransactionStatus
+    }
+
+    class detailTransactionEntity <<Entity>> {
+        - id{PK}: number
+        - id_emisor {FK}: number
+        - id_receptor {FK}: number
+        - id_transaction {FK}: number
+        - id_publication {FK}: number
+        - quantity: number
+    }
+
+    enum TransactionStatus <<Enumerate>> {
+        PENDING
+        ACCEPTED
+        REJECTED
+     }
+
+     TransactionModule "1" *-- "1" TransactionController
+     TransactionModule "1" *-- "1" TransactionService
+
+     TransactionController "1" --> "1" TransactionService : usa
+     TransactionService ..> TransactionEntity : <<Instancia>>
+     TransactionEntity "1" --> "1" TransactionStatus : estado
+     TransactionEntity "1" *-- "1" detailTransactionEntity
+
+}
+
+' Agregación: El módulo raíz agrupa a los módulos hijos
+AppModule "1" o-- "1" UsersModule
+AppModule "1" o-- "1" PublicationsModule
+AppModule "1" o-- "1" ReportModule
+AppModule "1" o-- "1" TransactionModule
+
+' Agregación: Un usuario agrupa publicaciones
+UserEntity "1" o-- "0..*" Publication
+UserEntity "1" o-- "0..*" TransactionEntity
+@enduml
