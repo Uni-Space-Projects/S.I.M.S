@@ -10,29 +10,29 @@ class Usuario
 class Administrador
 class Publicacion
 class Categoria
-class Solicitud
 class Transaccion
+class detailTransaccion
 class Calificacion
 class Reporte
 
 ' Relaciones y Multiplicidades
 Usuario "1" -- "0..*" Publicacion : crea >
-Publicacion "*" -- "1" Categoria : pertenece a >
+Publicacion "0..*" -- "1" Categoria : pertenece a >
 
+Usuario "1" -- "0..*" Transaccion : realiza >
 
-Usuario "1" -- "0..*" Solicitud : realiza >
-Solicitud "*" -- "1" Publicacion : asociada a >
+'relacion 1 a 1 para evitar registros duplicados.
+detailTransaccion "1" -- "1" Publicacion : asociada a >
 
 Transaccion "1" -- "0..2" Calificacion : recibe >
 Usuario "1" -- "0..*" Calificacion : posee >
 
-Solicitud "1" -- "0..1" Transaccion : genera >
-Transaccion "*" -- "1" Usuario : intercambia >
+detailTransaccion "0..*" -- "1" Usuario : intercambia >
+detailTransaccion "1" -- "1" Transaccion : contiene >
 
 Usuario "1" -- "0..*" Reporte : emite >
-Reporte "*" -- "1" Publicacion : señala >
+Reporte "0..*" -- "1" Publicacion : señala >
 
-Administrador "1" -- "*" Reporte : revisa >
-Administrador "1" -- "*" Usuario : gestiona >
-
+Administrador  --  Reporte : revisa >
+Administrador  --  Usuario : gestiona >
 @enduml
