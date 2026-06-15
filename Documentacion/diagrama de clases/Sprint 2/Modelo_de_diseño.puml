@@ -71,6 +71,7 @@ package "Módulo de Publicaciones" {
         + remove(id: number): Publication
         + expirationDateAlert(publication: Publication): boolean
         + changePublicationStatus(publication: Publication): Publication
+        + verificarVencimientos(publication: Publication): boolean
     }
 
     class Publication <<Entity>> {
@@ -198,7 +199,7 @@ AppModule "1" o-- "1" ReportModule
 AppModule "1" o-- "1" TransactionModule
 
 ' Agregación: Un usuario agrupa publicaciones
-UserEntity "1" o-- "0..*" Publication
+UserEntity "1" -- "0..*" Publication
 UserEntity "1" o-- "0..*" detailTransactionEntity
 
 ' Para mantener simplicidad cuando una publicacion tiene una transaccion no se pueden hacer mas transacciones.
