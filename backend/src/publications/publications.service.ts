@@ -10,6 +10,7 @@ export class PublicationsService {
   constructor(
     @InjectRepository(Publication)
     private readonly publicationRepository: Repository<Publication>,
+    private readonly publicationDeletedRepository: Repository<Publication>
   ) { }
 
   // 🔵 CREAR PUBLICACIÓN
@@ -116,6 +117,17 @@ export class PublicationsService {
 
     publication.isActive = false;
 
-    return this.publicationRepository.save(publication);
+    return this.publicationDeletedRepository.save(publication);
   }
+
+  async reload(id: number){
+    const publication = await this.findOne(id);
+    if (!publication.isActive || !publication) {
+      throw new NotFoundException('Publicación no encontrada');
+    }
+
+    publication.isActive = true;
+  }
+
+
 }
