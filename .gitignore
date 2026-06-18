@@ -39,7 +39,7 @@ lerna-debug.log*
 # Frontend (Next.js)
 .next/
 
-# Documentos de contexto para IA
+# Documentos de contexto
 contexto/
 Documentacion/Sprint 1/Analisis_Diagramas_vs_Codigo.md
 Diseño3.pdf
