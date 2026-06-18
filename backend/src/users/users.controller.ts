@@ -30,7 +30,12 @@ export class UsersController {
   }
 
   @Post('register')
-  register(@Body() body: RegisterDto) {
-    return this.usersService.register(body);
+  async register(@Body() body: RegisterDto) {
+    const u_creado = await this.usersService.register(body);
+    this.cacheUsuarios.push(u_creado);
+    return {
+      user: u_creado.id,
+      email: u_creado.email,
+    };
   }
 }

@@ -72,9 +72,6 @@ export class UsersService {
 
     await this.userRepository.save(user);
 
-    return {
-      id: user.id,
-        email: user.email,
-    };
+    return new UserEntity(user.id,user.nombre,user.apellido,user.email,user.contrasena,user.telefono,user.rol,user.publications);
   }
 }
