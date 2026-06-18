@@ -29,4 +29,17 @@ export class Publication {
 
   @ManyToOne(() => UserEntity, (user) => user.publications)
   user: UserEntity;
+
+
+  constructor(id: number, name: string, lote: string, expirationDate: Date, description: string, additionalInfo: string, type: string, isActive: boolean, user: UserEntity) {
+    this.id = id;
+    this.name = name;
+    this.lote = lote;
+    this.expirationDate = expirationDate;
+    this.description = description;
+    this.additionalInfo = additionalInfo;
+    this.type = type;
+    this.isActive = isActive;
+    this.user = user;
+  }
 }
