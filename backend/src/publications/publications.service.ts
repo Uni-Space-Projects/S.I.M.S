@@ -4,13 +4,21 @@ import { ILike, Repository } from 'typeorm';
 import { Publication } from './publications.entity';
 import { CreatePublicationDto } from './Dto/create-publication.dto';
 import { UpdatePublicationDto } from './Dto/update-publication.dto';
+import { DeletedPublication } from './DeletedPublication.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { PublicationDeletedEvent } from './publications.events';
+import { PublicationRestoredEvent } from './publications.events';
+
+
 
 @Injectable()
 export class PublicationsService {
   constructor(
     @InjectRepository(Publication)
     private readonly publicationRepository: Repository<Publication>,
-    private readonly publicationDeletedRepository: Repository<Publication>
+    @InjectRepository(DeletedPublication)
+    private readonly publicationDeletedRepository: Repository<DeletedPublication>,
+    private eventEmitter: EventEmitter2
   ) { }
 
   // 🔵 CREAR PUBLICACIÓN
@@ -114,10 +122,12 @@ export class PublicationsService {
   // 🔵 ELIMINAR (soft delete)
   async remove(id: number) {
     const publication = await this.findOne(id);
-
     publication.isActive = false;
 
-    return this.publicationDeletedRepository.save(publication);
+    this.eventEmitter.emit(
+        'publication.deleted',
+        new PublicationDeletedEvent(id, publication)
+    );
   }
 
   async reload(id: number){
@@ -125,8 +135,12 @@ export class PublicationsService {
     if (!publication.isActive || !publication) {
       throw new NotFoundException('Publicación no encontrada');
     }
-
     publication.isActive = true;
+
+    this.eventEmitter.emit(
+      'publication.restored',
+      new PublicationRestoredEvent(id, publication)
+    );
   }
 
 
