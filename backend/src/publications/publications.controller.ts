@@ -51,7 +51,6 @@ export class PublicationsController {
     return this.publicationsService.remove(+id);
   }
 
-  // 🔵 RESTAURAR
   @Post(':id/restore')
   restore(@Param('id') id: string) {
     return this.publicationsService.reload(+id);
