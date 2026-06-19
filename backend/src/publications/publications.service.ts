@@ -121,26 +121,48 @@ export class PublicationsService {
 
   // 🔵 ELIMINAR (soft delete)
   async remove(id: number) {
-    const publication = await this.findOne(id);
+    const publication = await this.publicationRepository.findOne({
+      where: { id },
+      relations: ['user']
+    });
+    if (!publication) {
+      throw new NotFoundException('Publicación no encontrada');
+    }
     publication.isActive = false;
 
-    this.eventEmitter.emit(
+    await this.eventEmitter.emitAsync(
         'publication.deleted',
         new PublicationDeletedEvent(id, publication)
     );
   }
 
   async reload(id: number){
-    const publication = await this.findOne(id);
-    if (!publication.isActive || !publication) {
-      throw new NotFoundException('Publicación no encontrada');
+    const deletedPub = await this.publicationDeletedRepository.findOne({
+      where: { id },
+      relations: ['user']
+    });
+    if (!deletedPub) {
+      throw new NotFoundException('Publicación eliminada no encontrada');
     }
-    publication.isActive = true;
 
-    this.eventEmitter.emit(
+    const publication = this.publicationRepository.create({
+      id: deletedPub.id,
+      name: deletedPub.name,
+      lote: deletedPub.lote,
+      expirationDate: deletedPub.expirationDate,
+      description: deletedPub.description,
+      additionalInfo: deletedPub.additionalInfo,
+      type: deletedPub.type,
+      isActive: true,
+      user: deletedPub.user,
+    });
+
+    await this.eventEmitter.emitAsync(
       'publication.restored',
       new PublicationRestoredEvent(id, publication)
     );
+
+    return publication;
   }
 
 

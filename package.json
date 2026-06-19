@@ -17,6 +17,7 @@
     "concurrently": "^8.0.0"
   },
   "dependencies": {
-    "@nestjs/event-emitter": "^2.1.1"
+    "@nestjs/event-emitter": "^2.1.1",
+    "pdf-parse": "^2.4.5"
   }
 }
