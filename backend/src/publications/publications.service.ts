@@ -18,8 +18,8 @@ export class PublicationsService {
     private readonly publicationRepository: Repository<Publication>,
     @InjectRepository(DeletedPublication)
     private readonly publicationDeletedRepository: Repository<DeletedPublication>,
-    private eventEmitter: EventEmitter2
-  ) { }
+    private eventEmitter: EventEmitter2,
+  ) {}
 
   // 🔵 CREAR PUBLICACIÓN
   async create(dto: CreatePublicationDto) {
@@ -41,14 +41,14 @@ export class PublicationsService {
 
   // 🔵 OBTENER TODAS (solo activas y no vencidas)
   async findAll() {
-    const publicaciones =  await this.publicationRepository.find({
+    const publicaciones = await this.publicationRepository.find({
       where: {
         isActive: true,
       },
     });
 
     if (publicaciones.length === 0) {
-        throw new NotFoundException("No hay publicaciones creadas");
+      throw new NotFoundException('No hay publicaciones creadas');
     }
 
     return publicaciones;
@@ -64,7 +64,7 @@ export class PublicationsService {
     });
 
     if (!usurario.length) {
-        throw new NotFoundException('Usuario no encontrado');
+      throw new NotFoundException('Usuario no encontrado');
     }
 
     return usurario;
@@ -78,7 +78,6 @@ export class PublicationsService {
         name: ILike(`${term}%`),
       },
     });
-
 
     if (publications.length === 0) {
       throw new NotFoundException(`No se encontraron publicaciones`);
@@ -121,25 +120,19 @@ export class PublicationsService {
 
   // 🔵 ELIMINAR (soft delete)
   async remove(id: number) {
-    const publication = await this.publicationRepository.findOne({
-      where: { id },
-      relations: ['user']
-    });
-    if (!publication) {
-      throw new NotFoundException('Publicación no encontrada');
-    }
+    const publication = await this.findOne(id);
     publication.isActive = false;
 
-    await this.eventEmitter.emitAsync(
-        'publication.deleted',
-        new PublicationDeletedEvent(id, publication)
+    this.eventEmitter.emit(
+      'publication.deleted',
+      new PublicationDeletedEvent(id, publication),
     );
   }
 
-  async reload(id: number){
+  async reload(id: number) {
     const deletedPub = await this.publicationDeletedRepository.findOne({
       where: { id },
-      relations: ['user']
+      relations: ['user'],
     });
     if (!deletedPub) {
       throw new NotFoundException('Publicación eliminada no encontrada');
@@ -157,13 +150,11 @@ export class PublicationsService {
       user: deletedPub.user,
     });
 
-    await this.eventEmitter.emitAsync(
+    this.eventEmitter.emit(
       'publication.restored',
-      new PublicationRestoredEvent(id, publication)
+      new PublicationRestoredEvent(id, publication),
     );
 
     return publication;
   }
-
-
 }

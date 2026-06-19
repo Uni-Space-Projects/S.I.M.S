@@ -4,7 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DeletedPublication } from './DeletedPublication.entity';
 import { Publication } from './publications.entity';
-import { PublicationDeletedEvent, PublicationRestoredEvent } from './publications.events';
+import {
+  PublicationDeletedEvent,
+  PublicationRestoredEvent,
+} from './publications.events';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class PublicationListenersService {
