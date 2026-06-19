@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+    const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -29,23 +32,30 @@ export default function LoginPage() {
 
             const data = await response.json();
 
-            if (data.success) {
+            if (response.ok) {
                 setMessage("Inicio de sesión exitoso");
-                console.log("Usuario:", data.user);
+                console.log("Usuario:", data.nombre);
+                console.log(data);
+                // Guardar usuario en localStorage para las publicaciones
+                localStorage.setItem("sims_user_id", JSON.stringify(data.id));
+
+                setTimeout(() => {
+                    router.push("/inicio");
+                }, 500);
             } else {
                 setMessage(data.message || "Error al iniciar sesión");
+                setLoading(false);
             }
         } catch (error) {
             setMessage("No se pudo conectar con el servidor");
             console.error("Error en login:", error);
-        } finally {
             setLoading(false);
         }
     }
 
     return (
-        <main className="min-h-screen flex items-center justify-center bg-linear-to-r from-emerald-800 via-emerald-500 to-emerald-300 px-4">
-            <section className="w-full max-w-sm rounded-2xl bg-emerald-400 p-8">
+        <main className="min-h-screen flex items-center justify-center bg-background px-4">
+            <section className="w-full max-w-sm rounded-2xl bg-emerald-400 p-8 shadow-2xl">
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-bold text-white">
                         Iniciar sesión
@@ -67,7 +77,7 @@ export default function LoginPage() {
                             placeholder="ejemplo@correo.com"
                             value={email}
                             onChange={(event) => setEmail(event.target.value)}
-                            className="w-full rounded-lg border border-gray-300 px-4 py-3 bg-white outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+                            className="w-full rounded-lg border text-black border-gray-300 px-4 py-3 bg-white outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
                             required
                         />
                     </div>
@@ -99,6 +109,13 @@ export default function LoginPage() {
                         {loading ? "Ingresando..." : "Entrar"}
                     </button>
                 </form>
+
+                <p className="mt-6 text-center text-sm text-gray-600">
+                    ¿No tienes cuenta?{" "}
+                    <Link href="/register" className="font-semibold text-blue-600 hover:text-blue-700">
+                        Regístrate aquí
+                    </Link>
+                </p>
 
                 {message && (
                     <p className="mt-5 text-center text-sm font-medium text-gray-700">
