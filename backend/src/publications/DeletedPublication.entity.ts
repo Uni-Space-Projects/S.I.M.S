@@ -1,9 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne } from 'typeorm';
 import { UserEntity } from '../users/users.entity';
 
 @Entity()
 export class DeletedPublication {
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn()
     id: number;
 
     @Column()
@@ -15,8 +15,8 @@ export class DeletedPublication {
     @Column({ type: 'date' })
     expirationDate: Date;
 
-    @Column()
-    description: string;
+    @Column({ nullable: true })
+    description?: string;
 
     @Column({ nullable: true })
     additionalInfo: string;

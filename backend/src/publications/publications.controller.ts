@@ -50,4 +50,10 @@ export class PublicationsController {
   remove(@Param('id') id: string) {
     return this.publicationsService.remove(+id);
   }
+
+  // 🔵 RESTAURAR
+  @Post(':id/restore')
+  restore(@Param('id') id: string) {
+    return this.publicationsService.reload(+id);
+  }
 }

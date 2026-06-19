@@ -4,10 +4,11 @@ import { PublicationsService } from './publications.service';
 import { PublicationsController } from './publications.controller';
 import { Publication } from './publications.entity';
 import { DeletedPublication } from './DeletedPublication.entity';
+import { PublicationListenersService } from './PublicationHistoryListener';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Publication, DeletedPublication])],
   controllers: [PublicationsController],
-  providers: [PublicationsService],
+  providers: [PublicationsService, PublicationListenersService],
 })
 export class PublicationsModule {}
