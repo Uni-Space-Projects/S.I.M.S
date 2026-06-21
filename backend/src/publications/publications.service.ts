@@ -4,13 +4,21 @@ import { ILike, Repository } from 'typeorm';
 import { Publication } from './publications.entity';
 import { CreatePublicationDto } from './Dto/create-publication.dto';
 import { UpdatePublicationDto } from './Dto/update-publication.dto';
+import { DeletedPublication } from './DeletedPublication.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { PublicationDeletedEvent } from './publications.events';
+import { PublicationRestoredEvent } from './publications.events';
+
 
 @Injectable()
 export class PublicationsService {
   constructor(
     @InjectRepository(Publication)
     private readonly publicationRepository: Repository<Publication>,
-  ) { }
+    @InjectRepository(DeletedPublication)
+    private readonly publicationDeletedRepository: Repository<DeletedPublication>,
+    private eventEmitter: EventEmitter2,
+  ) {}
 
   // 🔵 CREAR PUBLICACIÓN
   async create(dto: CreatePublicationDto) {
@@ -32,14 +40,14 @@ export class PublicationsService {
 
   // 🔵 OBTENER TODAS (solo activas y no vencidas)
   async findAll() {
-    const publicaciones =  await this.publicationRepository.find({
+    const publicaciones = await this.publicationRepository.find({
       where: {
         isActive: true,
       },
     });
 
     if (publicaciones.length === 0) {
-        throw new NotFoundException("No hay publicaciones creadas");
+      throw new NotFoundException('No hay publicaciones creadas');
     }
 
     return publicaciones;
@@ -55,7 +63,7 @@ export class PublicationsService {
     });
 
     if (!usurario.length) {
-        throw new NotFoundException('Usuario no encontrado');
+      throw new NotFoundException('Usuario no encontrado');
     }
 
     return usurario;
@@ -69,7 +77,6 @@ export class PublicationsService {
         name: ILike(`${term}%`),
       },
     });
-
 
     if (publications.length === 0) {
       throw new NotFoundException(`No se encontraron publicaciones`);
@@ -113,9 +120,40 @@ export class PublicationsService {
   // 🔵 ELIMINAR (soft delete)
   async remove(id: number) {
     const publication = await this.findOne(id);
-
     publication.isActive = false;
 
-    return this.publicationRepository.save(publication);
+    this.eventEmitter.emit(
+      'publication.deleted',
+      new PublicationDeletedEvent(id, publication),
+    );
+  }
+
+  async reload(id: number) {
+    const deletedPub = await this.publicationDeletedRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+    if (!deletedPub) {
+      throw new NotFoundException('Publicación eliminada no encontrada');
+    }
+
+    const publication = this.publicationRepository.create({
+      id: deletedPub.id,
+      name: deletedPub.name,
+      lote: deletedPub.lote,
+      expirationDate: deletedPub.expirationDate,
+      description: deletedPub.description,
+      additionalInfo: deletedPub.additionalInfo,
+      type: deletedPub.type,
+      isActive: true,
+      user: deletedPub.user,
+    });
+
+    this.eventEmitter.emit(
+      'publication.restored',
+      new PublicationRestoredEvent(id, publication),
+    );
+
+    return publication;
   }
 }

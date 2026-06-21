@@ -15,8 +15,8 @@ export class Publication {
   @Column({ type: 'date' })
   expirationDate: Date;
 
-  @Column()
-  description: string;
+  @Column({ nullable: true })
+  description?: string;
 
   @Column({ nullable: true })
   additionalInfo: string;

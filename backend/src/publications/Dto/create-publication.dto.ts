@@ -19,7 +19,7 @@ export class CreatePublicationDto {
   @IsDateString()
   expirationDate: string;
 
-  @IsNotEmpty()
+
   @IsString()
   description: string;
 
