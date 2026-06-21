@@ -79,5 +79,5 @@ group Ver Detalle de Publicación
         Client --> User: Muestra vista detallada del insumo
     end
 end
-
+    
 @enduml

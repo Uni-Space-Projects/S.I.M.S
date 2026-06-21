@@ -10,6 +10,8 @@ import Link from "next/link";
 export default function PublicationsClient() {
   const [publications, setPublications] = useState<PublicacionInsumo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [lastDeletedPublication, setLastDeletedPublication] = useState<PublicacionInsumo | null>(null);
 
   useEffect(() => {
     const fetchUserPublications = async () => {
@@ -32,6 +34,21 @@ export default function PublicationsClient() {
     fetchUserPublications();
   }, []);
 
+  // Auto-desvanecer Toast e historial temporal
+  useEffect(() => {
+    if (!toastMessage) return;
+
+    // Si hay una publicación eliminada temporalmente, dejar el toast más tiempo
+    const duration = lastDeletedPublication ? 8000 : 3000;
+
+    const timer = setTimeout(() => {
+      setToastMessage(null);
+      setLastDeletedPublication(null);
+    }, duration);
+
+    return () => clearTimeout(timer);
+  }, [toastMessage, lastDeletedPublication]);
+
   // Estados para Modal de Crear/Editar
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingPub, setEditingPub] = useState<PublicacionInsumo | null>(null);
@@ -40,8 +57,7 @@ export default function PublicationsClient() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedPub, setSelectedPub] = useState<PublicacionInsumo | null>(null);
 
-  // Estados para Notificaciones
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
 
   // Abrir Modal para crear una nueva publicación
   const handleOpenCreate = () => {
@@ -65,11 +81,40 @@ export default function PublicationsClient() {
 
   // Eliminar una publicación
   const handleDelete = async (id: number) => {
+    const pubToDelete = publications.find((pub) => pub.id === id);
+    if (!pubToDelete) return;
+
     try {
       await fetch(`http://localhost:3000/publications/${id}`, { method: "DELETE" });
+      setLastDeletedPublication(pubToDelete);
       setPublications((prev) => prev.filter((pub) => pub.id !== id));
+      setToastMessage("Publicación eliminada.");
     } catch (error) {
       console.error("Error eliminando publicación", error);
+      setToastMessage("Error al eliminar la publicación");
+    }
+  };
+
+  // Restaurar publicación eliminada (Deshacer)
+  const handleRestore = async () => {
+    if (!lastDeletedPublication) return;
+    const id = lastDeletedPublication.id;
+
+    try {
+      const response = await fetch(`http://localhost:3000/publications/${id}/restore`, {
+        method: "POST",
+      });
+
+      if (!response.ok) throw new Error("Error al restaurar");
+
+      const restoredPub = await response.json();
+
+      setPublications((prev) => [restoredPub, ...prev]);
+      setLastDeletedPublication(null);
+      setToastMessage("Publicación restaurada con éxito.");
+    } catch (error) {
+      console.error("Error restaurando publicación:", error);
+      setToastMessage("Error al intentar deshacer la acción");
     }
   };
 
@@ -145,11 +190,9 @@ export default function PublicationsClient() {
 
       setIsCreateOpen(false);
       setEditingPub(null);
-      setTimeout(() => setToastMessage(null), 3000);
     } catch (error) {
       console.error("Error guardando publicación:", error);
       setToastMessage("Ocurrió un error con el servidor");
-      setTimeout(() => setToastMessage(null), 3000);
     }
   };
 
@@ -282,9 +325,21 @@ export default function PublicationsClient() {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-primary-container text-on-primary-container border border-primary/20 px-5 py-3.5 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center gap-3 animate-fade-in-down">
-          <span className="material-symbols-outlined text-[22px] text-primary">check_circle</span>
-          <span className="font-label-md font-bold text-sm tracking-wide">{toastMessage}</span>
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-inverse-surface text-inverse-on-surface border border-outline-variant/10 px-5 py-3.5 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.25)] flex items-center justify-between gap-4 animate-fade-in-up min-w-[320px] max-w-[95%] md:min-w-[400px]">
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-[22px] text-primary-fixed-dim">
+              {lastDeletedPublication ? "delete" : "check_circle"}
+            </span>
+            <span className="font-label-md font-semibold text-sm tracking-wide text-white">{toastMessage}</span>
+          </div>
+          {lastDeletedPublication && (
+            <button
+              onClick={handleRestore}
+              className="text-primary-fixed-dim hover:text-white transition-colors text-sm font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg hover:bg-white/10 cursor-pointer active:scale-95 duration-150"
+            >
+              Deshacer
+            </button>
+          )}
         </div>
       )}
 
@@ -309,18 +364,18 @@ export default function PublicationsClient() {
         .pb-safe {
           padding-bottom: env(safe-area-inset-bottom);
         }
-        @keyframes fade-in-down {
+        @keyframes fade-in-up {
           from {
             opacity: 0;
-            transform: translate(-50%, -20px);
+            transform: translate(-50%, 20px);
           }
           to {
             opacity: 1;
             transform: translate(-50%, 0);
           }
         }
-        .animate-fade-in-down {
-          animation: fade-in-down 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        .animate-fade-in-up {
+          animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
       `}</style>
     </div>
