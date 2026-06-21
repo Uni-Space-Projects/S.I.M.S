@@ -10,7 +10,6 @@ import { PublicationDeletedEvent } from './publications.events';
 import { PublicationRestoredEvent } from './publications.events';
 
 
-
 @Injectable()
 export class PublicationsService {
   constructor(
