@@ -14,7 +14,7 @@ import { Publication } from './publications.entity'
 
 @Controller('publications')
 export class PublicationsController {
-  constructor(private readonly publicationsService: PublicationsService) {}
+  constructor(private readonly publicationsService: PublicationsService) { }
 
   private cacheFind: Publication[] = [];
 
@@ -34,7 +34,7 @@ export class PublicationsController {
     return this.publicationsService.findAll();
   }
 
-  // 🔵 OBTENER POR USUARIO
+  // 🔵 OBTENER POR USUARIO TODO: Preguntar a la profesora sobre esta implementacion ya que es muy ineficiente.
   @Get('user/:userId')
   async findByUser(@Param('userId') userId: string) {
     const almacenadas: Publication[] = [];

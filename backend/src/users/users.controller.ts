@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { LoginDto } from './dto/Login.Dto';
 import { RegisterDto } from './dto/Register.Dto';
@@ -37,6 +37,26 @@ export class UsersController {
       user: u_creado.id,
       email: u_creado.email,
     };
+  }
+
+  // 🔵 OBTENER USUARIO POR ID (para perfil)
+  @Get(':id')
+  async findById(@Param('id') id: string) {
+    // Buscar en caché primero
+    for (const usuario of this.cacheUsuarios) {
+      if (usuario.id?.toString() === id) {
+        // Retornar sin la contraseña
+        const { contrasena, ...perfil } = usuario as any;
+        return perfil;
+      }
+    }
+
+    const user = await this.usersService.findById(+id);
+    this.cacheUsuarios.push(user);
+
+    // Retornar sin la contraseña
+    const { contrasena, ...perfil } = user as any;
+    return perfil;
   }
 
 }
