@@ -18,7 +18,7 @@ export class PublicationsService {
     @InjectRepository(DeletedPublication)
     private readonly publicationDeletedRepository: Repository<DeletedPublication>,
     private eventEmitter: EventEmitter2,
-  ) {}
+  ) { }
 
   // 🔵 CREAR PUBLICACIÓN
   async create(dto: CreatePublicationDto) {
@@ -44,6 +44,7 @@ export class PublicationsService {
       where: {
         isActive: true,
       },
+      relations: ['user'],
     });
 
     if (publicaciones.length === 0) {
@@ -60,6 +61,7 @@ export class PublicationsService {
         isActive: true,
         user: { id: userId },
       },
+      //La base de datos tiene que cargar las tablas que estan relacionadas a las peticiones.
       relations: ['user'],
     });
 
@@ -90,6 +92,7 @@ export class PublicationsService {
   async findOne(id: number) {
     const publication = await this.publicationRepository.findOne({
       where: { id },
+      //La base de datos tiene que cargar las tablas que estan relacionadas a las peticiones.
       relations: ['user'],
     });
 

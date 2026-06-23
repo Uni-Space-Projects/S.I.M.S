@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { LoginDto } from './dto/Login.Dto';
 import { RegisterDto } from './dto/Register.Dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -23,7 +23,7 @@ export class UsersService {
       where: { email: loginDto.email },
     });
     if (!user) {
-      throw new UnauthorizedException('Credenciales incorrectas');
+      throw new NotFoundException('Usuario no encontrado');
     }
 
     const passwordMatch = await bcrypt.compare(
@@ -32,9 +32,9 @@ export class UsersService {
     );
 
     if (!passwordMatch) {
-      throw new UnauthorizedException ('Credenciales incorrectas');
+      throw new NotFoundException('Usuario no encontrado');
     } else {
-      return new UserEntity(user.id,user.nombre,user.apellido,user.email,user.contrasena,user.telefono,user.rol,user.publications)
+      return new UserEntity(user.id, user.nombre, user.apellido, user.email, user.contrasena, user.telefono, user.rol, user.publications)
     }
 
     //if (user.rol === Role.ADMIN) {
@@ -72,6 +72,20 @@ export class UsersService {
 
     await this.userRepository.save(user);
 
-    return new UserEntity(user.id,user.nombre,user.apellido,user.email,user.contrasena,user.telefono,user.rol,user.publications);
+    return new UserEntity(user.id, user.nombre, user.apellido, user.email, user.contrasena, user.telefono, user.rol, user.publications);
+  }
+
+  // 🔵 OBTENER USUARIO POR ID (para perfil)
+  async findById(id: number) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    return user;
   }
 }
+

@@ -1,5 +1,14 @@
 export type EstadoInsumo = 'ABIERTO' | 'CERRADO';
 
+export interface UserBasic {
+  id: number;
+  nombre: string;
+  apellido: string;
+  email: string;
+  telefono: string;
+  rol: string;
+}
+
 export interface PublicacionInsumo {
   id: number;
   name: string;
@@ -9,5 +18,5 @@ export interface PublicacionInsumo {
   additionalInfo?: string;
   type: string;
   isActive: boolean;
-  // TODO: we could include User entity relation here if needed later
+  user?: UserBasic;
 }
