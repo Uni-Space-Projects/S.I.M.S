@@ -60,6 +60,7 @@ export class PublicationsService {
         isActive: true,
         user: { id: userId },
       },
+      relations: ['user'],
     });
 
     if (!usurario.length) {
@@ -89,6 +90,7 @@ export class PublicationsService {
   async findOne(id: number) {
     const publication = await this.publicationRepository.findOne({
       where: { id },
+      relations: ['user'],
     });
 
     if (!publication) {

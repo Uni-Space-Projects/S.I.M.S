@@ -8,7 +8,7 @@ import {
   PublicationDeletedEvent,
   PublicationRestoredEvent,
 } from './publications.events';
-import { InjectRepository } from '@nestjs/typeorm';
+
 
 @Injectable()
 export class PublicationListenersService {
