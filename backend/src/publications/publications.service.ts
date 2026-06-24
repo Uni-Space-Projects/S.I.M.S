@@ -148,7 +148,6 @@ export class PublicationsService {
       lote: deletedPub.lote,
       expirationDate: deletedPub.expirationDate,
       description: deletedPub.description,
-      additionalInfo: deletedPub.additionalInfo,
       type: deletedPub.type,
       isActive: true,
       user: deletedPub.user,

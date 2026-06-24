@@ -35,7 +35,6 @@ export class PublicationListenersService {
             lote: event.publicationData.lote,
             expirationDate: event.publicationData.expirationDate,
             description: event.publicationData.description,
-            additionalInfo: event.publicationData.additionalInfo,
             type: event.publicationData.type,
             isActive: event.publicationData.isActive,
             user: event.publicationData.user,

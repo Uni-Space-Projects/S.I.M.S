@@ -18,9 +18,6 @@ export class DeletedPublication {
     @Column({ nullable: true })
     description?: string;
 
-    @Column({ nullable: true })
-    additionalInfo: string;
-
     @Column()
     type: string;
 
@@ -34,13 +31,12 @@ export class DeletedPublication {
     expiresIn: Date;
 
 
-    constructor(id: number, name: string, lote: string, expirationDate: Date, description: string, additionalInfo: string, type: string, isActive: boolean, user: UserEntity, expiresIn: Date) {
+    constructor(id: number, name: string, lote: string, expirationDate: Date, description: string, type: string, isActive: boolean, user: UserEntity, expiresIn: Date) {
         this.id = id;
         this.name = name;
         this.lote = lote;
         this.expirationDate = expirationDate;
         this.description = description;
-        this.additionalInfo = additionalInfo;
         this.type = type;
         this.isActive = isActive;
         this.user = user;
