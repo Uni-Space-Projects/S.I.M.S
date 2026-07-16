@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { LoginDto } from './dto/Login.Dto';
 import { RegisterDto } from './dto/Register.Dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,12 +6,10 @@ import { Repository } from 'typeorm';
 import { UserEntity } from './users.entity';
 import * as bcrypt from 'bcrypt';
 import { Role } from './roles.enum';
-import {
-  UnauthorizedException,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
+import { ConflictException } from '@nestjs/common';
 
+//Injectable significa que puedes usar esta clase en otras clases
 @Injectable()
 export class UsersService {
   constructor(
@@ -19,32 +17,13 @@ export class UsersService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async findOne(id: number): Promise<UserEntity | null> {
-    return this.userRepository.findOne({
-      where: { id },
-    });
-  }
-
-  async findAll(): Promise<UserEntity[]> {
-    return this.userRepository.find();
-  }
-
-  async updateRole(id: number, rol: Role): Promise<UserEntity> {
-    const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException('Usuario no encontrado');
-    }
-    user.rol = rol;
-    return this.userRepository.save(user);
-  }
-
   async login(loginDto: LoginDto) {
     //Esto ya retorna el objeto instanciado.
     const user = await this.userRepository.findOne({
       where: { email: loginDto.email },
     });
     if (!user) {
-      throw new UnauthorizedException('Credenciales incorrectas');
+      throw new NotFoundException('Usuario no encontrado');
     }
 
     const passwordMatch = await bcrypt.compare(
@@ -53,7 +32,7 @@ export class UsersService {
     );
 
     if (!passwordMatch) {
-      throw new UnauthorizedException('Credenciales incorrectas');
+      throw new NotFoundException('Usuario no encontrado');
     } else {
       return new UserEntity(
         user.id,
@@ -112,5 +91,37 @@ export class UsersService {
       user.rol,
       user.publications,
     );
+  }
+
+  // 🔵 OBTENER USUARIO POR ID (para perfil)
+  async findById(id: number) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    return user;
+  }
+
+  async findOne(id: number): Promise<UserEntity | null> {
+    return this.userRepository.findOne({
+      where: { id },
+    });
+  }
+
+  async findAll(): Promise<UserEntity[]> {
+    return this.userRepository.find();
+  }
+
+  async updateRole(id: number, rol: Role): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    user.rol = rol;
+    return this.userRepository.save(user);
   }
 }

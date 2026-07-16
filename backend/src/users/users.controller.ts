@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Param,
-  NotFoundException,
-  Patch,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { LoginDto } from './dto/Login.Dto';
 import { RegisterDto } from './dto/Register.Dto';
@@ -31,17 +23,6 @@ export class UsersController {
     });
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const user = await this.usersService.findOne(Number(id));
-    if (!user) {
-      throw new NotFoundException('Usuario no encontrado');
-    }
-    const result = { ...user };
-    delete (result as Partial<UserEntity>).contrasena;
-    return result;
-  }
-
   @Patch(':id/role')
   async updateRole(@Param('id') id: string, @Body('rol') rol: Role) {
     const user = await this.usersService.updateRole(Number(id), rol);
@@ -55,14 +36,11 @@ export class UsersController {
   //Body agarra el json que envio el usuario al mandarle el formulario del login y lo guarda en una variable body
   async login(@Body() body: LoginDto) {
     //Llama al metodo login en usersService
-    for (const usuario of this.cacheUsuarios) {
-      if (usuario.email === body.email) {
-        const passwordMatch = await bcrypt.compare(
-          body.password,
-          usuario.contrasena,
-        );
-        if (passwordMatch) {
-          const result = { ...usuario };
+    for (const usuarios of this.cacheUsuarios) {
+      if (usuarios.email === body.email) {
+        const match = await bcrypt.compare(body.password, usuarios.contrasena);
+        if (match) {
+          const result = { ...usuarios };
           delete (result as Partial<UserEntity>).contrasena;
           return result;
         }
@@ -80,9 +58,31 @@ export class UsersController {
     const u_creado = await this.usersService.register(body);
     this.cacheUsuarios.push(u_creado);
     return {
-      success: true,
       user: u_creado.id,
       email: u_creado.email,
+      success: true,
     };
+  }
+
+  // 🔵 OBTENER USUARIO POR ID (para perfil)
+  @Get(':id')
+  async findById(@Param('id') id: string) {
+    // Buscar en caché primero
+    for (const usuario of this.cacheUsuarios) {
+      if (usuario.id?.toString() === id) {
+        // Retornar sin la contraseña
+        const result = { ...usuario };
+        delete (result as Partial<UserEntity>).contrasena;
+        return result;
+      }
+    }
+
+    const user = await this.usersService.findById(+id);
+    this.cacheUsuarios.push(user);
+
+    // Retornar sin la contraseña
+    const result = { ...user };
+    delete (result as Partial<UserEntity>).contrasena;
+    return result;
   }
 }

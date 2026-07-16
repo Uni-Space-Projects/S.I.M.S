@@ -43,6 +43,7 @@ export class PublicationsService {
       where: {
         isActive: true,
       },
+      relations: ['user'],
     });
 
     if (publicaciones.length === 0) {
@@ -59,6 +60,8 @@ export class PublicationsService {
         isActive: true,
         user: { id: userId },
       },
+      //La base de datos tiene que cargar las tablas que estan relacionadas a las peticiones.
+      relations: ['user'],
     });
 
     if (!usurario.length) {
@@ -89,6 +92,8 @@ export class PublicationsService {
   async findOne(id: number) {
     const publication = await this.publicationRepository.findOne({
       where: { id },
+      //La base de datos tiene que cargar las tablas que estan relacionadas a las peticiones.
+      relations: ['user'],
     });
 
     if (!publication) {
@@ -119,16 +124,10 @@ export class PublicationsService {
 
   // 🔵 ELIMINAR (soft delete)
   async remove(id: number) {
-    const publication = await this.publicationRepository.findOne({
-      where: { id },
-      relations: ['user'],
-    });
-    if (!publication) {
-      throw new NotFoundException('Publicación no encontrada');
-    }
+    const publication = await this.findOne(id);
     publication.isActive = false;
 
-    await this.eventEmitter.emitAsync(
+    this.eventEmitter.emit(
       'publication.deleted',
       new PublicationDeletedEvent(id, publication),
     );
@@ -149,13 +148,13 @@ export class PublicationsService {
       lote: deletedPub.lote,
       expirationDate: deletedPub.expirationDate,
       description: deletedPub.description,
-      additionalInfo: deletedPub.additionalInfo,
       type: deletedPub.type,
       isActive: true,
+      cantidad: deletedPub.cantidad,
       user: deletedPub.user,
     });
 
-    await this.eventEmitter.emitAsync(
+    this.eventEmitter.emit(
       'publication.restored',
       new PublicationRestoredEvent(id, publication),
     );

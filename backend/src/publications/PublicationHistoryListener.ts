@@ -14,7 +14,6 @@ export class PublicationListenersService {
   constructor(
     @InjectRepository(DeletedPublication)
     private publicationDeletedRepository: Repository<DeletedPublication>,
-
     @InjectRepository(Publication)
     private publicationRepository: Repository<Publication>,
   ) {}
@@ -26,6 +25,7 @@ export class PublicationListenersService {
       `Moviendo la publicación ${event.publicationId} al historial de eliminados...`,
     );
 
+    // Calculamos la fecha de expiración (7 días a partir de hoy)
     const expiresIn = new Date();
     expiresIn.setDate(expiresIn.getDate() + 7);
 
@@ -36,9 +36,9 @@ export class PublicationListenersService {
       lote: event.publicationData.lote,
       expirationDate: event.publicationData.expirationDate,
       description: event.publicationData.description,
-      additionalInfo: event.publicationData.additionalInfo,
       type: event.publicationData.type,
       isActive: event.publicationData.isActive,
+      cantidad: event.publicationData.cantidad,
       user: event.publicationData.user,
       expiresIn: expiresIn,
     });

@@ -19,9 +19,8 @@ export class CreatePublicationDto {
   @IsDateString()
   expirationDate: string;
 
-  @IsOptional()
   @IsString()
-  description?: string;
+  description: string;
 
   @IsOptional()
   @IsString()
@@ -31,6 +30,10 @@ export class CreatePublicationDto {
   @IsNotEmpty()
   @IsString()
   type: string; //TODO: Hacer enumerate de esto (etiquetas para el motor de busqueda).
+
+  @IsNotEmpty()
+  @IsNumber()
+  cantidad: number;
 
   @IsNotEmpty()
   @IsNumber()
