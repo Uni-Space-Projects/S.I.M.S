@@ -18,14 +18,14 @@ export class DeletedPublication {
   @Column({ nullable: true })
   description?: string;
 
-  @Column({ nullable: true })
-  additionalInfo: string;
-
   @Column()
   type: string;
 
   @Column({ default: true })
   isActive: boolean;
+
+  @Column({ type: 'int', default: 1 })
+  cantidad: number;
 
   @ManyToOne(() => UserEntity, (user) => user.publications)
   user: UserEntity;
@@ -39,9 +39,9 @@ export class DeletedPublication {
     lote: string,
     expirationDate: Date,
     description: string,
-    additionalInfo: string,
     type: string,
     isActive: boolean,
+    cantidad: number,
     user: UserEntity,
     expiresIn: Date,
   ) {
@@ -50,9 +50,9 @@ export class DeletedPublication {
     this.lote = lote;
     this.expirationDate = expirationDate;
     this.description = description;
-    this.additionalInfo = additionalInfo;
     this.type = type;
     this.isActive = isActive;
+    this.cantidad = cantidad;
     this.user = user;
     this.expiresIn = expiresIn;
   }

@@ -1,41 +1,40 @@
-```mermaid
 %%Diagrama de Componentes
 
 classDiagram
-    class WebApp {
-        <<Container Next.js>>
-    }
-    class Database {
-        <<Container PostgreSQL>>
-    }
+class WebApp {
+<<Container Next.js>>
+}
+class Database {
+<<Container PostgreSQL>>
+}
 
     class ModuloUsuarios {
-        <<Component Controller Service>>
-        +String perfil
-        +registro()
-        +autenticacion()
+        <<Controller Typescript>>
+        Realiza las validaciones
+        y registros de usuarios
     }
     class ModuloPublicaciones {
-        <<Component Controller Service>>
-        +crearPublicacion()
-        +actualizarPublicacion()
-        +eliminarPublicacion()
+        <<Controller Typescript>>
+        Realiza la logica para consultar
+        crear,eliminar y modificar
+        publicaciones.
     }
     class ModuloTransacciones {
-        <<Component Controller Service>>
-        +gestionarTrueques()
-        +validarEstados()
+        <<Controller Typescript>>
+        Realiza la logica para 
+        que los usuarios intercambien
+        entre si.
     }
     class ModuloAdministracion {
-        <<Component Controller Service>>
-        +gestionarReportes()
-        +gestionarAlertas()
-        +moderacion()
+        <<Controller Typescript>>
+        Creacion de nuevas 
+        funcionalidades para 
+        administradores
     }
     class GestorDeEventos {
-        <<Component Event Emitter>>
-        +emitirEvento()
-        +cerrarTransaccion()
+        <<Component Event Emitter Typescript>>
+        Emite eventos para 
+        gestionar los contenedores
     }
 
     WebApp --> ModuloUsuarios : Rutas usuarios REST

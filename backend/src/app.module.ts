@@ -3,6 +3,7 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PublicationsModule } from './publications/publications.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { TransactionsModule } from './transactions/transactions.module';
 import { ReportsModule } from './reports/reports.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { ReportsModule } from './reports/reports.module';
     }),
     UsersModule,
     PublicationsModule,
+    TransactionsModule,
     ReportsModule,
     EventEmitterModule.forRoot(),
   ],
