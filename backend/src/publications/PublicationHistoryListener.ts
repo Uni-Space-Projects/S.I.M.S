@@ -37,6 +37,7 @@ export class PublicationListenersService {
             description: event.publicationData.description,
             type: event.publicationData.type,
             isActive: event.publicationData.isActive,
+            cantidad: event.publicationData.cantidad,
             user: event.publicationData.user,
             expiresIn: expiresIn,
         });
