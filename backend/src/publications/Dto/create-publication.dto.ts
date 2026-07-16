@@ -34,5 +34,9 @@ export class CreatePublicationDto {
 
   @IsNotEmpty()
   @IsNumber()
+  cantidad: number;
+
+  @IsNotEmpty()
+  @IsNumber()
   userId: number;
 }

@@ -150,6 +150,7 @@ export class PublicationsService {
       description: deletedPub.description,
       type: deletedPub.type,
       isActive: true,
+      cantidad: deletedPub.cantidad,
       user: deletedPub.user,
     });
 

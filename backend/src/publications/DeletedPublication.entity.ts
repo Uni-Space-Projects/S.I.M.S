@@ -24,6 +24,9 @@ export class DeletedPublication {
     @Column({ default: true })
     isActive: boolean;
 
+    @Column({ type: 'int', default: 1 })
+    cantidad: number;
+
     @ManyToOne(() => UserEntity, (user) => user.publications)
     user: UserEntity;
 
@@ -31,7 +34,7 @@ export class DeletedPublication {
     expiresIn: Date;
 
 
-    constructor(id: number, name: string, lote: string, expirationDate: Date, description: string, type: string, isActive: boolean, user: UserEntity, expiresIn: Date) {
+    constructor(id: number, name: string, lote: string, expirationDate: Date, description: string, type: string, isActive: boolean, cantidad: number, user: UserEntity, expiresIn: Date) {
         this.id = id;
         this.name = name;
         this.lote = lote;
@@ -39,6 +42,7 @@ export class DeletedPublication {
         this.description = description;
         this.type = type;
         this.isActive = isActive;
+        this.cantidad = cantidad;
         this.user = user;
         this.expiresIn = expiresIn;
     }
