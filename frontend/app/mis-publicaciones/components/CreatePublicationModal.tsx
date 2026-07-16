@@ -29,18 +29,21 @@ export default function CreatePublicationModal({
 
   // Cargar datos si estamos en modo edición
   useEffect(() => {
-    if (publication) {
-      setName(publication.name);
-      setLote(publication.lote);
-      setExpirationDate(publication.expirationDate);
-      setDescription(publication.description || "");
-    } else {
-      // Limpiar formulario para nueva creación
-      setName("");
-      setLote("");
-      setExpirationDate("");
-      setDescription("");
-    }
+    const timer = setTimeout(() => {
+      if (publication) {
+        setName(publication.name);
+        setLote(publication.lote);
+        setExpirationDate(publication.expirationDate);
+        setDescription(publication.description || "");
+      } else {
+        // Limpiar formulario para nueva creación
+        setName("");
+        setLote("");
+        setExpirationDate("");
+        setDescription("");
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, [publication, isOpen]);
 
   if (!isOpen) return null;

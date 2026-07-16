@@ -28,7 +28,7 @@ export default function PublicationCard({
       const timeDiff = expirationDateObj.getTime() - today.getTime();
       const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
-      return daysDiff <= 30;
+      return daysDiff <= 5;
     } catch {
       return false;
     }

@@ -3,6 +3,7 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PublicationsModule } from './publications/publications.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   //Informacion necesaria para conectar una base de datos local con postgresql
@@ -20,7 +21,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     }),
     UsersModule,
     PublicationsModule,
-    EventEmitterModule.forRoot()
+    ReportsModule,
+    EventEmitterModule.forRoot(),
   ],
 })
 export class AppModule {}

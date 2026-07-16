@@ -4,61 +4,68 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DeletedPublication } from './DeletedPublication.entity';
 import { Publication } from './publications.entity';
-import { PublicationDeletedEvent, PublicationRestoredEvent } from './publications.events';
+import {
+  PublicationDeletedEvent,
+  PublicationRestoredEvent,
+} from './publications.events';
 
 @Injectable()
 export class PublicationListenersService {
-    constructor(
-        @InjectRepository(DeletedPublication)
-        private publicationDeletedRepository: Repository<DeletedPublication>,
-        @InjectRepository(Publication)
-        private publicationRepository: Repository<Publication>
-    ) {}
+  constructor(
+    @InjectRepository(DeletedPublication)
+    private publicationDeletedRepository: Repository<DeletedPublication>,
 
-    // Este método se ejecutará automáticamente cuando se emita 'publication.deleted'
-    @OnEvent('publication.deleted')
-    async handlePublicationDeletedEvent(event: PublicationDeletedEvent) {
-        console.log(`Moviendo la publicación ${event.publicationId} al historial de eliminados...`);
-        
-        // Calculamos la fecha de expiración (7 días a partir de hoy)
-        const expiresIn = new Date();
-        expiresIn.setDate(expiresIn.getDate() + 7);
+    @InjectRepository(Publication)
+    private publicationRepository: Repository<Publication>,
+  ) {}
 
-        // Instanciamos el DeletedPublication con todos los datos necesarios
-        const deletedPublication = this.publicationDeletedRepository.create({
-            id: event.publicationData.id,
-            name: event.publicationData.name,
-            lote: event.publicationData.lote,
-            expirationDate: event.publicationData.expirationDate,
-            description: event.publicationData.description,
-            additionalInfo: event.publicationData.additionalInfo,
-            type: event.publicationData.type,
-            isActive: event.publicationData.isActive,
-            user: event.publicationData.user,
-            expiresIn: expiresIn,
-        });
+  // Este método se ejecutará automáticamente cuando se emita 'publication.deleted'
+  @OnEvent('publication.deleted')
+  async handlePublicationDeletedEvent(event: PublicationDeletedEvent) {
+    console.log(
+      `Moviendo la publicación ${event.publicationId} al historial de eliminados...`,
+    );
 
-        // Ejecucion automatica (esperando a que termine):
-        try {
-            await this.publicationDeletedRepository.save(deletedPublication);
-            await this.publicationRepository.delete(event.publicationId);
-        } catch (error) {
-            console.error('Error al archivar la publicación eliminada:', error);
-            throw error;
-        }
+    const expiresIn = new Date();
+    expiresIn.setDate(expiresIn.getDate() + 7);
+
+    // Instanciamos el DeletedPublication con todos los datos necesarios
+    const deletedPublication = this.publicationDeletedRepository.create({
+      id: event.publicationData.id,
+      name: event.publicationData.name,
+      lote: event.publicationData.lote,
+      expirationDate: event.publicationData.expirationDate,
+      description: event.publicationData.description,
+      additionalInfo: event.publicationData.additionalInfo,
+      type: event.publicationData.type,
+      isActive: event.publicationData.isActive,
+      user: event.publicationData.user,
+      expiresIn: expiresIn,
+    });
+
+    // Ejecucion automatica (esperando a que termine):
+    try {
+      await this.publicationDeletedRepository.save(deletedPublication);
+      await this.publicationRepository.delete(event.publicationId);
+    } catch (error) {
+      console.error('Error al archivar la publicación eliminada:', error);
+      throw error;
     }
+  }
 
-    @OnEvent('publication.restored')
-    async handlePublicationRestoredEvent(event: PublicationRestoredEvent) {
-        console.log(`Limpiando la publicación ${event.publicationId} del historial de eliminados...`);
+  @OnEvent('publication.restored')
+  async handlePublicationRestoredEvent(event: PublicationRestoredEvent) {
+    console.log(
+      `Limpiando la publicación ${event.publicationId} del historial de eliminados...`,
+    );
 
-        // Aquí la lógica inversa (esperando a que termine):
-        try {
-            await this.publicationRepository.save(event.publicationData);
-            await this.publicationDeletedRepository.delete(event.publicationId);
-        } catch (error) {
-            console.error('Error al restaurar la publicación:', error);
-            throw error;
-        }
+    // Aquí la lógica inversa (esperando a que termine):
+    try {
+      await this.publicationRepository.save(event.publicationData);
+      await this.publicationDeletedRepository.delete(event.publicationId);
+    } catch (error) {
+      console.error('Error al restaurar la publicación:', error);
+      throw error;
     }
+  }
 }

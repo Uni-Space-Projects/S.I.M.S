@@ -9,8 +9,6 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PublicationDeletedEvent } from './publications.events';
 import { PublicationRestoredEvent } from './publications.events';
 
-
-
 @Injectable()
 export class PublicationsService {
   constructor(
@@ -18,8 +16,8 @@ export class PublicationsService {
     private readonly publicationRepository: Repository<Publication>,
     @InjectRepository(DeletedPublication)
     private readonly publicationDeletedRepository: Repository<DeletedPublication>,
-    private eventEmitter: EventEmitter2
-  ) { }
+    private eventEmitter: EventEmitter2,
+  ) {}
 
   // 🔵 CREAR PUBLICACIÓN
   async create(dto: CreatePublicationDto) {
@@ -41,14 +39,14 @@ export class PublicationsService {
 
   // 🔵 OBTENER TODAS (solo activas y no vencidas)
   async findAll() {
-    const publicaciones =  await this.publicationRepository.find({
+    const publicaciones = await this.publicationRepository.find({
       where: {
         isActive: true,
       },
     });
 
     if (publicaciones.length === 0) {
-        throw new NotFoundException("No hay publicaciones creadas");
+      throw new NotFoundException('No hay publicaciones creadas');
     }
 
     return publicaciones;
@@ -64,7 +62,7 @@ export class PublicationsService {
     });
 
     if (!usurario.length) {
-        throw new NotFoundException('Usuario no encontrado');
+      throw new NotFoundException('Usuario no encontrado');
     }
 
     return usurario;
@@ -76,9 +74,9 @@ export class PublicationsService {
       where: {
         // 🔵 2. Lo aplicas aquí. Si 'term' es "hola", buscará "Hola", "HOLA", "hola", etc.
         name: ILike(`${term}%`),
+        isActive: true,
       },
     });
-
 
     if (publications.length === 0) {
       throw new NotFoundException(`No se encontraron publicaciones`);
@@ -123,7 +121,7 @@ export class PublicationsService {
   async remove(id: number) {
     const publication = await this.publicationRepository.findOne({
       where: { id },
-      relations: ['user']
+      relations: ['user'],
     });
     if (!publication) {
       throw new NotFoundException('Publicación no encontrada');
@@ -131,15 +129,15 @@ export class PublicationsService {
     publication.isActive = false;
 
     await this.eventEmitter.emitAsync(
-        'publication.deleted',
-        new PublicationDeletedEvent(id, publication)
+      'publication.deleted',
+      new PublicationDeletedEvent(id, publication),
     );
   }
 
-  async reload(id: number){
+  async reload(id: number) {
     const deletedPub = await this.publicationDeletedRepository.findOne({
       where: { id },
-      relations: ['user']
+      relations: ['user'],
     });
     if (!deletedPub) {
       throw new NotFoundException('Publicación eliminada no encontrada');
@@ -159,11 +157,21 @@ export class PublicationsService {
 
     await this.eventEmitter.emitAsync(
       'publication.restored',
-      new PublicationRestoredEvent(id, publication)
+      new PublicationRestoredEvent(id, publication),
     );
 
     return publication;
   }
 
-
+  // 🔵 DESACTIVAR (para moderación de administrador sin borrar la entidad y romper FKey de reportes)
+  async deactivate(id: number) {
+    const publication = await this.publicationRepository.findOne({
+      where: { id },
+    });
+    if (!publication) {
+      throw new NotFoundException('Publicación no encontrada');
+    }
+    publication.isActive = false;
+    return this.publicationRepository.save(publication);
+  }
 }

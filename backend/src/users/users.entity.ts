@@ -32,8 +32,16 @@ export class UserEntity {
   @OneToMany(() => Publication, (publication) => publication.user)
   publications: Publication[];
 
-
-  constructor(id: number, nombre: string, apellido: string, email: string, contrasena: string, telefono: string, rol: Role, publications: Publication[]) {
+  constructor(
+    id: number,
+    nombre: string,
+    apellido: string,
+    email: string,
+    contrasena: string,
+    telefono: string,
+    rol: Role,
+    publications: Publication[],
+  ) {
     this.id = id;
     this.nombre = nombre;
     this.apellido = apellido;
