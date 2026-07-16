@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { PublicacionInsumo } from "../types";
+import { useAuth } from "../../context/AuthContext";
 
 interface PublicationDetailModalProps {
   publication: PublicacionInsumo | null;
@@ -20,12 +21,61 @@ export default function PublicationDetailModal({
   onDelete,
   readOnly = false,
 }: PublicationDetailModalProps) {
+  const { user } = useAuth();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  
+  const [isReporting, setIsReporting] = useState(false);
+  const [reportMotivo, setReportMotivo] = useState("");
+  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+  const [reportToast, setReportToast] = useState<string | null>(null);
 
   // Resetear el estado de confirmación si se cierra o cambia la publicación
   React.useEffect(() => {
-    setIsConfirmingDelete(false);
+    const timer = setTimeout(() => {
+      setIsConfirmingDelete(false);
+      setIsReporting(false);
+      setReportMotivo("");
+      setReportToast(null);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [isOpen, publication]);
+
+  const handleSubmitReport = async () => {
+    if (!publication || !user || !reportMotivo.trim()) return;
+
+    setIsSubmittingReport(true);
+    try {
+      const res = await fetch("http://localhost:3000/reports", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          usuarioReportaId: user.id,
+          publicacionId: publication.id,
+          motivo: reportMotivo,
+        }),
+      });
+
+      if (res.ok) {
+        setReportToast("Publicación reportada con éxito.");
+        setIsReporting(false);
+        setReportMotivo("");
+        setTimeout(() => {
+          setReportToast(null);
+          onClose();
+        }, 1500);
+      } else {
+        const errData = await res.json();
+        setReportToast(errData.message || "Error al enviar el reporte.");
+      }
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      setReportToast("No se pudo conectar con el servidor.");
+    } finally {
+      setIsSubmittingReport(false);
+    }
+  };
 
   if (!isOpen || !publication) return null;
 
@@ -129,6 +179,53 @@ export default function PublicationDetailModal({
               {description || "No se ha proporcionado una descripción detallada para este insumo."}
             </p>
           </div>
+
+          {/* Formulario de Reporte */}
+          {isReporting && (
+            <div className="bg-error/5 rounded-xl p-5 border border-error/20 flex flex-col gap-3 mt-4 animate-fade-in-up">
+              <div className="flex items-center gap-2 mb-1 text-error">
+                <span className="material-symbols-outlined text-[20px]">flag</span>
+                <h4 className="font-label-sm text-label-sm uppercase tracking-wide text-xs font-bold">
+                  Reportar Publicación
+                </h4>
+              </div>
+              <textarea
+                placeholder="Escribe detalladamente el motivo de tu reporte..."
+                value={reportMotivo}
+                onChange={(e) => setReportMotivo(e.target.value)}
+                className="w-full bg-surface border border-outline-variant rounded-xl p-3 text-sm outline-none focus:border-error focus:ring-1 focus:ring-error/20 transition-all text-on-surface min-h-[80px]"
+                required
+              />
+              <div className="flex justify-end gap-2.5 mt-1">
+                <button
+                  onClick={() => {
+                    setIsReporting(false);
+                    setReportMotivo("");
+                  }}
+                  className="px-4 py-2 rounded-lg border border-outline-variant font-semibold text-xs text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer"
+                  type="button"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSubmitReport}
+                  disabled={isSubmittingReport || !reportMotivo.trim()}
+                  className="px-5 py-2 rounded-lg bg-error hover:bg-[#B3261E] text-on-error font-semibold text-xs transition-colors cursor-pointer disabled:opacity-50"
+                  type="button"
+                >
+                  {isSubmittingReport ? "Enviando..." : "Enviar Reporte"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Toast del Reporte */}
+          {reportToast && (
+            <div className="mt-4 p-4 rounded-xl bg-inverse-surface text-inverse-on-surface flex items-center gap-2 text-xs font-semibold shadow-md animate-fade-in-up">
+              <span className="material-symbols-outlined text-[18px]">info</span>
+              {reportToast}
+            </div>
+          )}
         </div>
 
         {/* Footer Actions */}
@@ -164,6 +261,16 @@ export default function PublicationDetailModal({
               >
                 Volver
               </button>
+              {readOnly && user && !isReporting && (
+                <button
+                  onClick={() => setIsReporting(true)}
+                  className="px-5 py-2.5 rounded-lg border border-error text-error bg-surface font-label-sm text-label-sm font-semibold hover:bg-error-container hover:text-on-error-container transition-all duration-200 flex items-center gap-1.5 cursor-pointer ml-auto"
+                  type="button"
+                >
+                  <span className="material-symbols-outlined text-[18px]">flag</span>
+                  Reportar
+                </button>
+              )}
               {isActive && !readOnly && onEdit && onDelete && (
                 <>
                   <button

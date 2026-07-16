@@ -6,16 +6,37 @@ import { Repository } from 'typeorm';
 import { UserEntity } from './users.entity';
 import * as bcrypt from 'bcrypt';
 import { Role } from './roles.enum';
-import { UnauthorizedException } from '@nestjs/common';
-import { ConflictException } from '@nestjs/common';
+import {
+  UnauthorizedException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 
-//Injectable significa que puedes usar esta clase en otras clases
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-  ) { }
+  ) {}
+
+  async findOne(id: number): Promise<UserEntity | null> {
+    return this.userRepository.findOne({
+      where: { id },
+    });
+  }
+
+  async findAll(): Promise<UserEntity[]> {
+    return this.userRepository.find();
+  }
+
+  async updateRole(id: number, rol: Role): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    user.rol = rol;
+    return this.userRepository.save(user);
+  }
 
   async login(loginDto: LoginDto) {
     //Esto ya retorna el objeto instanciado.
@@ -32,9 +53,18 @@ export class UsersService {
     );
 
     if (!passwordMatch) {
-      throw new UnauthorizedException ('Credenciales incorrectas');
+      throw new UnauthorizedException('Credenciales incorrectas');
     } else {
-      return new UserEntity(user.id,user.nombre,user.apellido,user.email,user.contrasena,user.telefono,user.rol,user.publications)
+      return new UserEntity(
+        user.id,
+        user.nombre,
+        user.apellido,
+        user.email,
+        user.contrasena,
+        user.telefono,
+        user.rol,
+        user.publications,
+      );
     }
 
     //if (user.rol === Role.ADMIN) {
@@ -72,6 +102,15 @@ export class UsersService {
 
     await this.userRepository.save(user);
 
-    return new UserEntity(user.id,user.nombre,user.apellido,user.email,user.contrasena,user.telefono,user.rol,user.publications);
+    return new UserEntity(
+      user.id,
+      user.nombre,
+      user.apellido,
+      user.email,
+      user.contrasena,
+      user.telefono,
+      user.rol,
+      user.publications,
+    );
   }
 }

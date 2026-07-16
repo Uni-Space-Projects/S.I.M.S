@@ -10,5 +10,6 @@ import { PublicationListenersService } from './PublicationHistoryListener';
   imports: [TypeOrmModule.forFeature([Publication, DeletedPublication])],
   controllers: [PublicationsController],
   providers: [PublicationsService, PublicationListenersService],
+  exports: [PublicationsService],
 })
 export class PublicationsModule {}

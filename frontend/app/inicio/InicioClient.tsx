@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import { PublicacionInsumo } from "../mis-publicaciones/types";
 import PublicationCard from "../mis-publicaciones/components/PublicationCard";
 import SearchAndFilterBar from "./components/SearchAndFilterBar";
 import FilterOverlay from "./components/FilterOverlay";
 import PublicationDetailModal from "../mis-publicaciones/components/PublicationDetailModal";
+import Navbar from "../components/Navbar";
 
 export default function InicioClient() {
   const [publications, setPublications] = useState<PublicacionInsumo[]>([]);
@@ -94,42 +94,7 @@ export default function InicioClient() {
 
   return (
     <div className="bg-background text-on-background min-h-screen flex flex-col font-body-md w-full pb-24 md:pb-0 relative">
-      {/* Top Navbar */}
-      <nav className="bg-surface w-full sticky top-0 shadow-sm border-b border-outline-variant z-40">
-        <div className="flex items-center justify-between px-margin-mobile md:px-margin-desktop h-16 w-full max-w-container-max mx-auto">
-          <div className="flex items-center gap-2 cursor-pointer active:opacity-80 transition-opacity">
-            <span className="material-symbols-outlined text-primary text-[24px]">
-              medical_services
-            </span>
-            <span className="font-headline-md text-headline-md text-primary font-bold tracking-tight text-lg">
-              SIMS
-            </span>
-          </div>
-          <div className="hidden md:flex items-center gap-8">
-            <Link
-              href="/inicio"
-              className="text-primary font-bold hover:bg-surface-container-low transition-colors px-3 py-2 rounded-lg font-label-sm text-label-sm text-sm"
-            >
-              Inicio
-            </Link>
-            <Link
-              href="/mis-publicaciones"
-              className="text-on-surface-variant hover:bg-surface-container-low transition-colors px-3 py-2 rounded-lg font-label-sm text-label-sm text-sm"
-            >
-              Mis Publicaciones
-            </Link>
-            <button
-              onClick={() => {
-                localStorage.removeItem("sims_user_id");
-                window.location.href = "/login";
-              }}
-              className="text-error hover:bg-error-container hover:text-on-error-container transition-colors px-3 py-2 rounded-lg font-label-sm text-label-sm text-sm font-semibold cursor-pointer"
-            >
-              Cerrar Sesión
-            </button>
-          </div>
-        </div>
-      </nav>
+      <Navbar activePage="inicio" />
 
       {/* Main Content Area */}
       <main className="flex-1 w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-gutter pb-[100px] md:pb-gutter flex flex-col">
@@ -174,32 +139,7 @@ export default function InicioClient() {
         )}
       </main>
 
-      {/* Bottom Nav (Mobile Devices) */}
-      <nav className="fixed bottom-0 left-0 w-full z-50 bg-surface border-t border-outline-variant shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] md:hidden pb-safe">
-        <div className="flex justify-around items-center h-20 px-4 pb-2">
-          <Link
-            href="/inicio"
-            className="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-6 py-1.5 active:scale-95 transition-transform duration-200"
-          >
-            <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 1" }}>home</span>
-            <span className="font-label-sm text-label-sm mt-1 text-xs font-semibold text-white">Inicio</span>
-          </Link>
-          <Link
-            href="/mis-publicaciones"
-            className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-95 transition-transform duration-200 hover:bg-surface-container-low rounded-xl"
-          >
-            <span className="material-symbols-outlined">inventory_2</span>
-            <span className="font-label-sm text-label-sm mt-1 text-xs font-semibold">Mis Pub.</span>
-          </Link>
-          <Link
-            href="#"
-            className="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:scale-95 transition-transform duration-200 hover:bg-surface-container-low rounded-xl"
-          >
-            <span className="material-symbols-outlined">person</span>
-            <span className="font-label-sm text-label-sm mt-1 text-xs font-semibold">Perfil</span>
-          </Link>
-        </div>
-      </nav>
+
 
       {/* Filter Overlay */}
       <FilterOverlay

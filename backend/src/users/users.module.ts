@@ -13,5 +13,6 @@ import { UserEntity } from './users.entity';
   controllers: [UsersController],
   //dice quien va a recibir los datos
   providers: [UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}
