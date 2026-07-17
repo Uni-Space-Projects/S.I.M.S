@@ -10,7 +10,7 @@ PubClient --> PubCard["PublicationCard"] & CreateModal["CreatePublicationModal <
 PerfilPage --> PerfilClient["PerfilClient<br><small>/perfil/PerfilClient.tsx</small>"]
 PerfilClient --> EditProfileModal["EditProfileModal<br><small>/perfil/components/<br>EditProfileModal.tsx</small>"] & ReputacionSection["ReputacionSection<br><small>/perfil/components/<br>ReputacionSection.tsx</small>"]
 TransaccionesPage --> TransClient["TransaccionesClient<br><small>/transacciones/<br>TransaccionesClient.tsx</small>"]
-TransClient --> TransCard["TransaccionCard<br><small>/transacciones/components/<br>TransaccionCard.tsx</small>"] & TransDetail["TransaccionDetailModal<br><small>/transacciones/components/<br>TransaccionDetailModal.tsx</small>"] & CalifModal["CalificacionModal<br><small>/transacciones/components/<br>CalificacionModal.tsx</small>"]
+TransClient --> TransCard["TransaccionCard<br><small>/transacciones/components/<br>TransaccionCard.tsx</small>"] & TransDetail["TransaccionDetailModal<br><small>/transacciones/components/<br>TransaccionDetailModal.tsx</small>"]
 AdminUsuarios --> AdminUsClient["AdminUsuariosClient<br><small>/admin/usuarios/<br>AdminUsuariosClient.tsx</small>"]
 AdminUsClient --> UserTable["UserTable<br><small>/admin/usuarios/components/<br>UserTable.tsx</small>"] & UserEditModal["UserEditModal<br><small>/admin/usuarios/components/<br>UserEditModal.tsx</small>"]
 AdminReportes --> AdminRepClient["AdminReportesClient<br><small>/admin/reportes/<br>AdminReportesClient.tsx</small>"]
@@ -42,7 +42,6 @@ AlertaCard["AlertaCard<br><small>/admin/alertas/components/<br>AlertaCard.tsx</s
     style TransClient fill:#ecedfa,stroke:#727687,color:#191b24
     style TransCard fill:#f2f3ff,stroke:#727687,color:#191b24
     style TransDetail fill:#ffdbd0,stroke:#a33200,color:#191b24
-    style CalifModal fill:#ffdbd0,stroke:#a33200,color:#191b24
     style AdminUsClient fill:#ecedfa,stroke:#727687,color:#191b24
     style UserTable fill:#f2f3ff,stroke:#727687,color:#191b24
     style UserEditModal fill:#ffdbd0,stroke:#a33200,color:#191b24

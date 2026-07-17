@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { PublicacionInsumo } from "../types";
 import { useAuth } from "../../context/AuthContext";
+import SolicitudTransaccionModal from "../../transacciones/components/SolicitudTransaccionModal";
 
 interface PublicationDetailModalProps {
   publication: PublicacionInsumo | null;
@@ -23,6 +24,7 @@ export default function PublicationDetailModal({
 }: PublicationDetailModalProps) {
   const { user } = useAuth();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isSolicitando, setIsSolicitando] = useState(false);
   
   const [isReporting, setIsReporting] = useState(false);
   const [reportMotivo, setReportMotivo] = useState("");
@@ -262,14 +264,26 @@ export default function PublicationDetailModal({
                 Volver
               </button>
               {readOnly && user && !isReporting && (
-                <button
-                  onClick={() => setIsReporting(true)}
-                  className="px-5 py-2.5 rounded-lg border border-error text-error bg-surface font-label-sm text-label-sm font-semibold hover:bg-error-container hover:text-on-error-container transition-all duration-200 flex items-center gap-1.5 cursor-pointer ml-auto"
-                  type="button"
-                >
-                  <span className="material-symbols-outlined text-[18px]">flag</span>
-                  Reportar
-                </button>
+                <div className="flex gap-2 ml-auto">
+                  <button
+                    onClick={() => setIsReporting(true)}
+                    className="px-5 py-2.5 rounded-lg border border-error text-error bg-surface font-label-sm text-label-sm font-semibold hover:bg-error-container hover:text-on-error-container transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">flag</span>
+                    Reportar
+                  </button>
+                  {user.id !== publication.user?.id && (
+                    <button
+                      onClick={() => setIsSolicitando(true)}
+                      className="px-5 py-2.5 rounded-lg border border-transparent bg-primary text-on-primary font-label-sm text-label-sm font-semibold hover:bg-primary/90 shadow-sm transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
+                      type="button"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">handshake</span>
+                      Solicitar Trueque
+                    </button>
+                  )}
+                </div>
               )}
               {isActive && !readOnly && onEdit && onDelete && (
                 <>
@@ -298,6 +312,18 @@ export default function PublicationDetailModal({
           )}
         </div>
       </div>
+
+      {isSolicitando && user && (
+        <SolicitudTransaccionModal
+          publicacion={publication as any}
+          currentUserId={user.id}
+          onClose={() => setIsSolicitando(false)}
+          onSuccess={() => {
+            setIsSolicitando(false);
+            onClose();
+          }}
+        />
+      )}
 
       <style jsx>{`
         @keyframes fade-in-up {
