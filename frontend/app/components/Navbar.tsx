@@ -57,7 +57,7 @@ export default function Navbar({ activePage }: NavbarProps) {
             )}
 
             <Link
-              href="#"
+              href="/perfil"
               className={`transition-colors px-3 py-2 rounded-lg font-label-sm text-sm font-semibold hover:bg-surface-container-low ${
                 activePage === "perfil" ? "text-primary font-bold" : "text-on-surface-variant"
               }`}
@@ -124,7 +124,7 @@ export default function Navbar({ activePage }: NavbarProps) {
           )}
 
           <Link
-            href="#"
+            href="/perfil"
             className={`flex flex-col items-center justify-center transition-all duration-200 ${
               activePage === "perfil"
                 ? "bg-primary-container text-on-primary-container rounded-xl px-5 py-1.5 font-semibold text-white"
