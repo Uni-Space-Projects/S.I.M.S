@@ -15,5 +15,10 @@
   },
   "devDependencies": {
     "concurrently": "^8.0.0"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.28",
+    "@nestjs/typeorm": "^11.0.3",
+    "bcrypt": "^6.0.0"
   }
 }
