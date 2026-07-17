@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ReputacionSection from "./components/ReputacionSection";
+import EditProfileModal from "./components/EditProfileModal";
 
 interface UserProfile {
   id: number;
@@ -21,6 +22,7 @@ export default function PerfilClient() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -172,6 +174,17 @@ export default function PerfilClient() {
                           Mi Perfil
                         </span>
                       </span>
+                      <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="inline-flex items-center gap-1.5 bg-primary text-on-primary px-4 py-1.5 rounded-lg shadow-sm font-semibold hover:bg-primary/90 active:scale-95 transition-all"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">
+                          edit
+                        </span>
+                        <span className="font-label-sm text-label-sm uppercase tracking-wider text-xs">
+                          Editar
+                        </span>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -229,6 +242,18 @@ export default function PerfilClient() {
             {/* Reputación Section */}
             <ReputacionSection userId={user.id} userName={`${user.nombre} ${user.apellido}`} />
           </div>
+        )}
+
+        {/* Modal de Edición de Perfil */}
+        {isModalOpen && user && (
+          <EditProfileModal
+            user={user}
+            onClose={() => setIsModalOpen(false)}
+            onUpdateSuccess={(updatedUser) => {
+              // Actualización reactiva del estado local sin recargar la página
+              setUser((prevUser) => ({ ...prevUser!, ...updatedUser }));
+            }}
+          />
         )}
       </main>
 
