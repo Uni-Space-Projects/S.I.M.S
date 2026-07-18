@@ -280,17 +280,22 @@ export class TransactionsService {
   // HU7 - Calcular reputación de usuario (individualizada)
   async getUserReputation(userId: number) {
     const transacciones = await this.transactionRepository.createQueryBuilder('t')
-      .innerJoin('t.detalles', 'd')
-      .innerJoin('d.usuarioEmisor', 'ue')
-      .innerJoin('d.usuarioReceptor', 'ur')
+      .leftJoinAndSelect('t.detalles', 'd')
+      .leftJoinAndSelect('d.usuarioEmisor', 'ue')
+      .leftJoinAndSelect('d.usuarioReceptor', 'ur')
       .where('(ue.id = :userId OR ur.id = :userId)', { userId })
       .andWhere('t.estado = :estado', { estado: TransactionState.COMPLETED })
       .getMany();
+      
+    console.log("Transacciones obtenidas:", JSON.stringify(transacciones, null, 2));
 
     let suma = 0;
     let cantidad = 0;
 
     for (const t of transacciones) {
+      if (!t.detalles || t.detalles.length === 0) continue;
+      
+      // El iniciador es el emisor del PRIMER detalle (cuando se crea la transacción)
       const isIniciador = t.detalles[0]?.usuarioEmisor?.id === userId;
       if (isIniciador && t.calificacionAlIniciador != null) {
         suma += t.calificacionAlIniciador;
