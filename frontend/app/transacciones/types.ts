@@ -30,6 +30,9 @@ export interface Transaction {
   id: number;
   fecha_transaccion: string;
   estado: TransactionState;
-  calificacion: number | null;
+  calificacionAlIniciador: number | null;
+  calificacionAlReceptor: number | null;
+  iniciadorConfirmo: boolean;
+  receptorConfirmo: boolean;
   detalles: TransactionDetail[];
 }

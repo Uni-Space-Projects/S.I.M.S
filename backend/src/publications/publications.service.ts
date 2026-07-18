@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository, MoreThan } from 'typeorm';
 import { Publication } from './publications.entity';
@@ -22,9 +22,12 @@ export class PublicationsService {
   // CREAR PUBLICACIÓN
   async create(dto: CreatePublicationDto) {
     const expiration = new Date(dto.expirationDate);
+    expiration.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    if (expiration <= new Date()) {
-      throw new Error('La fecha de vencimiento no puede ser pasada');
+    if (expiration <= today) {
+      throw new BadRequestException('La fecha de vencimiento debe ser posterior a hoy');
     }
 
     const publication = this.publicationRepository.create({
@@ -117,9 +120,12 @@ export class PublicationsService {
 
     if (dto.expirationDate) {
       const expiration = new Date(dto.expirationDate);
+      expiration.setHours(0, 0, 0, 0);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-      if (expiration <= new Date()) {
-        throw new Error('Fecha de vencimiento inválida');
+      if (expiration <= today) {
+        throw new BadRequestException('La fecha de vencimiento debe ser posterior a hoy');
       }
 
       publication.expirationDate = expiration;

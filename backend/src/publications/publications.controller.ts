@@ -6,15 +6,21 @@ import {
   Param,
   Put,
   Delete,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PublicationsService } from './publications.service';
+import { UsersService } from '../users/users.service';
+import { Role } from '../users/roles.enum';
 import { CreatePublicationDto } from './Dto/create-publication.dto';
 import { UpdatePublicationDto } from './Dto/update-publication.dto';
 import { Publication } from './publications.entity';
 
 @Controller('publications')
 export class PublicationsController {
-  constructor(private readonly publicationsService: PublicationsService) {}
+  constructor(
+    private readonly publicationsService: PublicationsService,
+    private readonly usersService: UsersService,
+  ) {}
 
   private cacheFind: Publication[] = [];
 
@@ -106,9 +112,18 @@ export class PublicationsController {
     return publicacionActualizada;
   }
 
-  // ELIMINAR
+  // ELIMINAR (Deactivate logic for admins or owner)
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<void> {
+  async remove(@Param('id') id: string, @Body('adminId') adminId?: number): Promise<void> {
+    if (adminId) {
+      const admin = await this.usersService.findById(adminId);
+      if (admin.rol !== Role.ADMIN) {
+        throw new UnauthorizedException('No tienes permisos de administrador');
+      }
+    }
+    // Si no es admin, asumimos que es el dueño borrando su propia publicación. 
+    // Lo ideal sería validar que el userId coincida con el publicacion.user.id
+    
     await this.publicationsService.remove(+id);
     const index = this.cacheFind.findIndex(
       (publi) => publi.id.toString() === id,
@@ -119,7 +134,15 @@ export class PublicationsController {
   }
 
   @Post(':id/restore')
-  async restore(@Param('id') id: string) {
+  async restore(@Param('id') id: string, @Body('adminId') adminId: number) {
+    if (!adminId) {
+      throw new UnauthorizedException('Se requiere ID de administrador');
+    }
+    const admin = await this.usersService.findById(adminId);
+    if (admin.rol !== Role.ADMIN) {
+      throw new UnauthorizedException('Solo los administradores pueden restaurar');
+    }
+
     const restaurada = await this.publicationsService.reload(+id);
     if (!this.cacheFind.some((c) => c.id === restaurada.id)) {
       this.cacheFind.push(restaurada);

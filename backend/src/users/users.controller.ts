@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Patch, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { LoginDto } from './dto/Login.Dto';
 import { RegisterDto } from './dto/Register.Dto';
@@ -24,7 +24,19 @@ export class UsersController {
   }
 
   @Patch(':id/role')
-  async updateRole(@Param('id') id: string, @Body('rol') rol: Role) {
+  async updateRole(
+    @Param('id') id: string,
+    @Body('rol') rol: Role,
+    @Body('adminId') adminId: number,
+  ) {
+    if (!adminId) {
+      throw new UnauthorizedException('Se requiere ID de administrador');
+    }
+    const admin = await this.usersService.findById(adminId);
+    if (admin.rol !== Role.ADMIN) {
+      throw new UnauthorizedException('Solo los administradores pueden cambiar roles');
+    }
+
     const user = await this.usersService.updateRole(Number(id), rol);
     const result = { ...user };
     delete (result as Partial<UserEntity>).contrasena;

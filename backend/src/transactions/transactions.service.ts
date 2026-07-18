@@ -25,7 +25,7 @@ export class TransactionsService {
     private readonly publicationRepository: Repository<Publication>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-  ) {}
+  ) { }
 
   // HU4 - Crear Transacción (Solicitar insumos)
   async create(dto: CreateTransactionDto) {
@@ -250,9 +250,9 @@ export class TransactionsService {
     const transacciones = await query.getMany();
 
     if (transacciones.length === 0) {
-      return { 
-        average: 0, 
-        total: 0 
+      return {
+        average: 0,
+        total: 0
       };
     }
 

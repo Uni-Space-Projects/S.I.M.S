@@ -239,8 +239,13 @@ export default function TransaccionDetailModal({
           </div>
 
           {/* Calificación (HU7) */}
-          {transaction.estado === "completada" && transaction.calificacion === null && (
-            <div className="mt-6 rounded-xl border border-purple-200 bg-purple-50 p-4">
+          {(() => {
+            const miCalificacion = isIniciador ? transaction.calificacionAlReceptor : transaction.calificacionAlIniciador;
+            if (transaction.estado !== "completada") return null;
+            
+            if (miCalificacion === null) {
+              return (
+                <div className="mt-6 rounded-xl border border-purple-200 bg-purple-50 p-4">
               {!showRating ? (
                 <div className="flex items-center justify-between">
                   <div>
@@ -284,26 +289,42 @@ export default function TransaccionDetailModal({
                 </div>
               )}
             </div>
-          )}
-          {transaction.estado === "completada" && transaction.calificacion !== null && (
-             <div className="mt-6 text-center">
-                 <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-800">
-                    ⭐ Calificación: {transaction.calificacion} / 10
-                 </span>
-             </div>
-          )}
+              );
+            } else {
+              return (
+                <div className="mt-6 text-center">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-800">
+                    ⭐ Calificación dada: {miCalificacion} / 10
+                  </span>
+                </div>
+              );
+            }
+          })()}
 
           {/* Acciones */}
           {transaction.estado === "pendiente" && (
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
               {isIniciador ? (
-                <button
-                  disabled={loading}
-                  onClick={() => updateStatus("cancelada")}
-                  className="w-full rounded-xl bg-red-50 text-red-600 border border-red-200 px-5 py-2.5 text-sm font-semibold transition hover:bg-red-100 disabled:opacity-50 sm:w-auto"
-                >
-                  Cancelar Solicitud
-                </button>
+                <>
+                  <button
+                    disabled={loading}
+                    onClick={() => updateStatus("cancelada")}
+                    className="w-full rounded-xl bg-red-50 text-red-600 border border-red-200 px-5 py-2.5 text-sm font-semibold transition hover:bg-red-100 disabled:opacity-50 sm:w-auto"
+                  >
+                    Cancelar Solicitud
+                  </button>
+                  {transaction.iniciadorConfirmo ? (
+                    <span className="text-sm font-medium text-green-700 flex items-center px-4">Esperando al receptor...</span>
+                  ) : (
+                    <button
+                      disabled={loading || !transaction.receptorConfirmo}
+                      onClick={() => updateStatus("completada")}
+                      className="w-full rounded-xl bg-green-600 text-white shadow-sm px-5 py-2.5 text-sm font-semibold transition hover:bg-green-700 disabled:opacity-50 sm:w-auto"
+                    >
+                      {transaction.receptorConfirmo ? "Confirmar Trueque" : "Esperando al receptor..."}
+                    </button>
+                  )}
+                </>
               ) : (
                 <>
                   <button
@@ -320,13 +341,17 @@ export default function TransaccionDetailModal({
                   >
                     Contraofertar
                   </button>
-                  <button
-                    disabled={loading}
-                    onClick={() => updateStatus("completada")}
-                    className="w-full rounded-xl bg-green-600 text-white shadow-sm px-5 py-2.5 text-sm font-semibold transition hover:bg-green-700 disabled:opacity-50 sm:w-auto"
-                  >
-                    Aceptar Trueque
-                  </button>
+                  {transaction.receptorConfirmo ? (
+                     <span className="text-sm font-medium text-green-700 flex items-center px-4">Esperando confirmación...</span>
+                  ) : (
+                    <button
+                      disabled={loading}
+                      onClick={() => updateStatus("completada")}
+                      className="w-full rounded-xl bg-green-600 text-white shadow-sm px-5 py-2.5 text-sm font-semibold transition hover:bg-green-700 disabled:opacity-50 sm:w-auto"
+                    >
+                      Aceptar Trueque
+                    </button>
+                  )}
                 </>
               )}
             </div>

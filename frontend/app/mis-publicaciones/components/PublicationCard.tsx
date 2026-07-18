@@ -1,5 +1,6 @@
 import React from "react";
 import { PublicacionInsumo } from "../types";
+import { CONFIG } from "../../config";
 
 interface PublicationCardProps {
   publication: PublicacionInsumo;
@@ -24,11 +25,11 @@ export default function PublicationCard({
       today.setHours(0, 0, 0, 0);
       expirationDateObj.setHours(0, 0, 0, 0);
 
-      // Si ya pasó la fecha o vence en los próximos 30 días, activar alerta
+      // Si ya pasó la fecha o vence en los próximos días (según config), activar alerta
       const timeDiff = expirationDateObj.getTime() - today.getTime();
       const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
 
-      return daysDiff <= 5;
+      return daysDiff <= CONFIG.DIAS_ALERTA_VENCIMIENTO;
     } catch {
       return false;
     }

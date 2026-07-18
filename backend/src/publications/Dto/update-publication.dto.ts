@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsDateString } from 'class-validator';
+import { IsOptional, IsString, IsDateString, IsInt, Min } from 'class-validator';
 
 export class UpdatePublicationDto {
   @IsOptional()
@@ -16,4 +16,9 @@ export class UpdatePublicationDto {
   @IsOptional()
   @IsString()
   additionalInfo?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  cantidad?: number;
 }
