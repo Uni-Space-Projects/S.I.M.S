@@ -2,7 +2,6 @@
 
 flowchart TB
 Root["RootLayout<br><small>layout.tsx + globals.css</small>"] --> Login["LoginPage"] & Register["RegisterPage"] & InicioPage["InicioPage"] & MisPubPage["MisPublicacionesPage"] & PerfilPage["PerfilPage<br><small>/perfil/page.tsx</small>"] & TransaccionesPage["TransaccionesPage<br><small>/transacciones/page.tsx</small>"] & AdminUsuarios["AdminUsuariosPage<br><small>/admin/usuarios/page.tsx</small>"] & AdminReportes["AdminReportesPage<br><small>/admin/reportes/page.tsx</small>"]
-Root --> AlertaCard
 InicioPage --> InicioClient["InicioClient"]
 InicioClient --> SearchBar["SearchAndFilterBar"] & FilterOv["FilterOverlay"] & PubCard_I["PublicationCard"] & DetailM_I["PublicationDetailModal"] & SolicitudBtn["SolicitudTransaccionModal<br><small>/transacciones/components/<br>SolicitudTransaccionModal.tsx</small>"]
 MisPubPage --> PubClient["PublicationsClient"]
@@ -12,10 +11,7 @@ PerfilClient --> EditProfileModal["EditProfileModal<br><small>/perfil/components
 TransaccionesPage --> TransClient["TransaccionesClient<br><small>/transacciones/<br>TransaccionesClient.tsx</small>"]
 TransClient --> TransCard["TransaccionCard<br><small>/transacciones/components/<br>TransaccionCard.tsx</small>"] & TransDetail["TransaccionDetailModal<br><small>/transacciones/components/<br>TransaccionDetailModal.tsx</small>"]
 AdminUsuarios --> AdminUsClient["AdminUsuariosClient<br><small>/admin/usuarios/<br>AdminUsuariosClient.tsx</small>"]
-AdminUsClient --> UserTable["UserTable<br><small>/admin/usuarios/components/<br>UserTable.tsx</small>"] & UserEditModal["UserEditModal<br><small>/admin/usuarios/components/<br>UserEditModal.tsx</small>"]
 AdminReportes --> AdminRepClient["AdminReportesClient<br><small>/admin/reportes/<br>AdminReportesClient.tsx</small>"]
-AdminRepClient --> ReporteCard["ReporteCard<br><small>/admin/reportes/components/<br>ReporteCard.tsx</small>"]
-AlertaCard["AlertaCard<br><small>/admin/alertas/components/<br>AlertaCard.tsx</small>"]
 
     style Root fill:#0050cb,color:#fff,stroke:#003fa4,stroke-width:2px
     style Login fill:#e1e2ee,stroke:#727687,color:#191b24
@@ -43,9 +39,5 @@ AlertaCard["AlertaCard<br><small>/admin/alertas/components/<br>AlertaCard.tsx</s
     style TransCard fill:#f2f3ff,stroke:#727687,color:#191b24
     style TransDetail fill:#ffdbd0,stroke:#a33200,color:#191b24
     style AdminUsClient fill:#ecedfa,stroke:#727687,color:#191b24
-    style UserTable fill:#f2f3ff,stroke:#727687,color:#191b24
-    style UserEditModal fill:#ffdbd0,stroke:#a33200,color:#191b24
-    style AlertaCard fill:#f2f3ff,stroke:#727687,color:#191b24
     style AdminRepClient fill:#ecedfa,stroke:#727687,color:#191b24
-    style ReporteCard fill:#f2f3ff,stroke:#727687,color:#191b24
 ```

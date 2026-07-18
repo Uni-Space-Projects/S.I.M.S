@@ -18,13 +18,18 @@ package "Módulo de Usuarios" {
     class UsersController <<Controller>> {
         + login(body: LoginDto): Object
         + register(body: RegisterDto): Object
-        + findUser(userId: number): Publication[]
+        + findAll(): Object[]
+        + updateRole(id: string, rol: Role): Object
+        + findById(id: string): Object
     }
 
     class UsersService <<Service>> {
         + login(loginDto: LoginDto): Object
         + register(registerDto: RegisterDto): Object
-        + findUser(userId: number): Publication[]
+        + findById(id: number): UserEntity
+        + findOne(id: number): UserEntity
+        + findAll(): UserEntity[]
+        + updateRole(id: number, rol: Role): UserEntity
     }
 
     class UserEntity <<Entity>> {
@@ -59,19 +64,20 @@ package "Módulo de Publicaciones" {
         + findByUser(userId: string): Object[]
         + findOne(id: string): Object
         + update(id: string, dto: UpdatePublicationDto): Object
-        + remove(id: string): Object
+        + remove(id: string): void
+        + restore(id: string): Object
     }
 
     class PublicationsService <<Service>>{
         + create(dto: CreatePublicationDto): Publication
         + findAll(): Publication[]
+        + findByUser(userId: number): Publication[]
         + findByInitialText(term: string): Publication[]
         + findOne(id: number): Publication
         + update(id: number, dto: UpdatePublicationDto): Publication
-        + remove(id: number): Publication
-        + expirationDateAlert(publication: Publication): boolean
-        + changePublicationStatus(publication: Publication): Publication
-        + verificarVencimientos(publication: Publication): boolean
+        + remove(id: number): void
+        + reload(id: number): Publication
+        + deactivate(id: number): Publication
     }
 
     class Publication <<Entity>> {
@@ -97,13 +103,12 @@ package "Módulo de Publicaciones" {
 
 package "Reportes"{
 
-    class ReportModule <<Module>> {}
+    class ReportsModule <<Module>> {}
 
-    class ReportController <<Controller>> {
+    class ReportsController <<Controller>> {
         + create(dto: CreateReportDto): Object
-        + acceptReport(id: int): Object
-        + rejectReport(id: int): Object
-        + ValidateReportStatus(id: int): Object
+        + findAll(): Object[]
+        + updateStatus(id: string, estado: string): Object
     }
 
     class ReportEntity <<Entity>> {
@@ -115,12 +120,11 @@ package "Reportes"{
 
     }
 
-     class ReportService <<Service>> {
-            + create(dto: CreateReportDto): Object
-            + aceptReport(id: int): Object
-            + rejectReport(id: int): Object
-            + validateReportStatus(id: int): Object
-        }
+     class ReportsService <<Service>> {
+        + create(dto: CreateReportDto): Object
+        + findAll(): Object[]
+        + updateStatus(id: number, estado: string): Object
+    }
 
     enum ReportStatus <<Enumerate>> {
         PENDING
@@ -128,37 +132,33 @@ package "Reportes"{
         REJECTED
      }
 
-     ReportModule "1" *-- "1" ReportController
-     ReportModule "1" *-- "1" ReportService
+     ReportsModule "1" *-- "1" ReportsController
+     ReportsModule "1" *-- "1" ReportsService
 
-     ReportController "1" --> "1" ReportService : usa
-     ReportService ..> ReportEntity : <<Instancia>>
+     ReportsController "1" --> "1" ReportsService : usa
+     ReportsService ..> ReportEntity : <<Instancia>>
      ReportEntity "1" --> "1" ReportStatus : estado
 }
 
 package Transacciones {
-    class TransactionModule <<Module>> {}
+    class TransactionsModule <<Module>> {}
 
-    class TransactionController <<Controller>> {
-        + requestTransaction(dto_transaction: CreateTransactionDto, dto_detail: CreateTransactionDetailDto): Object
-        + validateTransactionStatus (id: int): TransactionStatus
-        + deleteTransaction(id: int): Void
-        + findTransactionsByUser(userId: int): TransactionEntity[]
-        + findTransactionsById(userId: int): TransactionEntity[]
-        + editTransactionStatus(id: int, status: TransactionStatus): TransactionEntity
-        + addRating(id_emisor: int, rating: number): Void
-        + validatePublicationQuantity (transaction: detailTransactionEntity, quantity: number): boolean
+    class TransactionsController <<Controller>> {
+        + create(dto: CreateTransactionDto): Object
+        + findAll(): Object[]
+        + findOne(id: number): Object
+        + updateStatus(id: number, dto: UpdateTransactionDto): Object
+        + remove(id: number): Object
+        + rateTransaction(id: number, dto: RateTransactionDto): Object
     }
 
-    class TransactionService <<Service>> {
-        + requestTransaction(dto_transaction: CreateTransactionDto, dto_detail: CreateTransactionDetailDto): Object
-        + validateTransactionStatus (id: int): TransactionStatus
-        + deleteTransaction(id: int): Void
-        + findTransactionsByUser(userId: int): TransactionEntity[]
-        + findTransactionsById(userId: int): TransactionEntity[]
-        + editTransactionStatus(id: int, status: TransactionStatus): TransactionEntity
-        + addRating(id_emisor: int, rating: number): Void
-        + validatePublicationQuantity (transaction: detailTransactionEntity, quantity: number): boolean
+    class TransactionsService <<Service>> {
+        + create(dto: CreateTransactionDto): Object
+        + findAll(): Object[]
+        + findOne(id: number): Object
+        + updateStatus(id: number, dto: UpdateTransactionDto): Object
+        + remove(id: number): Object
+        + rateTransaction(id: number, dto: RateTransactionDto): Object
     }
 
     class TransactionEntity <<Entity>> {
@@ -182,11 +182,11 @@ package Transacciones {
         REJECTED
      }
 
-     TransactionModule "1" *-- "1" TransactionController
-     TransactionModule "1" *-- "1" TransactionService
+     TransactionsModule "1" *-- "1" TransactionsController
+     TransactionsModule "1" *-- "1" TransactionsService
 
-     TransactionController "1" --> "1" TransactionService : usa
-     TransactionService ..> TransactionEntity : <<Instancia>>
+     TransactionsController "1" --> "1" TransactionsService : usa
+     TransactionsService ..> TransactionEntity : <<Instancia>>
      TransactionEntity "1" --> "1" TransactionStatus : estado
      TransactionEntity "1" --* "1" detailTransactionEntity
 
@@ -195,8 +195,8 @@ package Transacciones {
 ' Agregación: El módulo raíz agrupa a los módulos hijos
 AppModule "1" o-- "1" UsersModule
 AppModule "1" o-- "1" PublicationsModule
-AppModule "1" o-- "1" ReportModule
-AppModule "1" o-- "1" TransactionModule
+AppModule "1" o-- "1" ReportsModule
+AppModule "1" o-- "1" TransactionsModule
 
 ' Agregación: Un usuario agrupa publicaciones
 UserEntity "1" -- "0..*" Publication

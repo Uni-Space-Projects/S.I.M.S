@@ -25,11 +25,11 @@ class Database {
         que los usuarios intercambien
         entre si.
     }
-    class ModuloAdministracion {
+    class ModuloReportes {
         <<Controller Typescript>>
-        Creacion de nuevas 
-        funcionalidades para 
-        administradores
+        Creacion y gestion 
+        de reportes de 
+        publicaciones
     }
     class GestorDeEventos {
         <<Component Event Emitter Typescript>>
@@ -40,14 +40,14 @@ class Database {
     WebApp --> ModuloUsuarios : Rutas usuarios REST
     WebApp --> ModuloPublicaciones : Rutas publicaciones REST
     WebApp --> ModuloTransacciones : Rutas transacciones REST
-    WebApp --> ModuloAdministracion : Rutas admin REST
+    WebApp --> ModuloReportes : Rutas reportes REST
     
     ModuloTransacciones ..> GestorDeEventos : Emite evento Asincrono
     
     ModuloUsuarios --> Database : Lectura Escritura TypeORM
     ModuloPublicaciones --> Database : Lectura Escritura TypeORM
     ModuloTransacciones --> Database : Lectura Escritura TypeORM
-    ModuloAdministracion --> Database : Lectura Escritura TypeORM
+    ModuloReportes --> Database : Lectura Escritura TypeORM
 
     %% Estilos aplicados directamente
     style WebApp fill:#438dd5,stroke:#2e6295,stroke-width:2px,color:#fff
@@ -55,5 +55,5 @@ class Database {
     style ModuloUsuarios fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:#fff
     style ModuloPublicaciones fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:#fff
     style ModuloTransacciones fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:#fff
-    style ModuloAdministracion fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:#fff
+    style ModuloReportes fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:#fff
     style GestorDeEventos fill:#4CAF50,stroke:#388E3C,stroke-width:2px,color:#fff
