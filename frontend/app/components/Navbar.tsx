@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 
 interface NavbarProps {
-  activePage: "inicio" | "mis-publicaciones" | "admin" | "perfil";
+  activePage: "inicio" | "mis-publicaciones" | "admin" | "perfil" | "transacciones";
 }
 
 export default function Navbar({ activePage }: NavbarProps) {
@@ -42,6 +42,15 @@ export default function Navbar({ activePage }: NavbarProps) {
               }`}
             >
               Mis Publicaciones
+            </Link>
+
+            <Link
+              href="/transacciones"
+              className={`transition-colors px-3 py-2 rounded-lg font-label-sm text-sm font-semibold hover:bg-surface-container-low ${
+                activePage === "transacciones" ? "text-primary font-bold" : "text-on-surface-variant"
+              }`}
+            >
+              Transacciones
             </Link>
 
             {/* Solo visible si el rol es admin */}
@@ -104,6 +113,20 @@ export default function Navbar({ activePage }: NavbarProps) {
               inventory_2
             </span>
             <span className="font-label-sm mt-1 text-[11px] font-semibold">Mis Pub.</span>
+          </Link>
+
+          <Link
+            href="/transacciones"
+            className={`flex flex-col items-center justify-center transition-all duration-200 ${
+              activePage === "transacciones"
+                ? "bg-primary-container text-on-primary-container rounded-xl px-5 py-1.5 font-semibold text-white"
+                : "text-on-surface-variant px-3 py-1 hover:bg-surface-container-low rounded-xl"
+            }`}
+          >
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: activePage === "transacciones" ? "'FILL' 1" : undefined }}>
+              sync_alt
+            </span>
+            <span className="font-label-sm mt-1 text-[11px] font-semibold">Transacc.</span>
           </Link>
 
           {/* Solo visible si el rol es admin */}

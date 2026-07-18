@@ -106,7 +106,7 @@ export class TransactionsService {
 
   // 🔵 HU6 - Obtener todas las transacciones
   async findAll() {
-    return await this.transactionRepository.find({
+    const transacciones = await this.transactionRepository.find({
       relations: [
         'detalles',
         'detalles.usuarioEmisor',
@@ -114,6 +114,14 @@ export class TransactionsService {
         'detalles.publicacion',
       ],
     });
+
+    transacciones.forEach(t => {
+      if (t.detalles) {
+        t.detalles.sort((a, b) => a.id - b.id);
+      }
+    });
+
+    return transacciones;
   }
 
   // 🔵 Obtener transacción por ID
@@ -130,6 +138,10 @@ export class TransactionsService {
 
     if (!transaccion) {
       throw new NotFoundException(`Transacción con ID ${id} no encontrada`);
+    }
+
+    if (transaccion.detalles) {
+      transaccion.detalles.sort((a, b) => a.id - b.id);
     }
 
     return transaccion;
