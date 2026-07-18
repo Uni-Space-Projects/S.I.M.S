@@ -124,6 +124,7 @@ export default function TransaccionDetailModal({
       <SolicitudTransaccionModal
         publicacion={recibo.publicacion}
         currentUserId={currentUserId}
+        otroUsuarioId={recibo.usuarioEmisor.id}
         onClose={() => setShowCounterOffer(false)}
         onSuccess={async () => {
           // Si se manda la nueva oferta exitosamente, rechazamos esta transacción automáticamente

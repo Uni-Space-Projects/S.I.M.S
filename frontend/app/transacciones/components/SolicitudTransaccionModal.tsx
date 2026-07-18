@@ -4,6 +4,7 @@ import { PublicationBasicInfo } from "../types";
 interface Props {
   publicacion: PublicationBasicInfo; // La publicación que el usuario quiere (la del otro)
   currentUserId: number;
+  otroUsuarioId?: number; // Opcional, para cuando se pasa desde contraoferta
   onClose: () => void;
   onSuccess?: () => void;
 }
@@ -11,6 +12,7 @@ interface Props {
 export default function SolicitudTransaccionModal({
   publicacion,
   currentUserId,
+  otroUsuarioId,
   onClose,
   onSuccess,
 }: Props) {
@@ -93,12 +95,12 @@ export default function SolicitudTransaccionModal({
         detalles: [
           {
             usuarioEmisorId: currentUserId, // Yo ofrezco mi producto
-            usuarioReceptorId: (publicacion as any).user?.id || (publicacion as any).usuarioId || 0, // Fallback si no viene, pero el backend lo necesita
+            usuarioReceptorId: otroUsuarioId || (publicacion as any).user?.id || (publicacion as any).usuarioId || 0, // Fallback si no viene, pero el backend lo necesita
             publicacionId: selectedOffer.id,
             cantidad: cantidadAOfrecer,
           },
           {
-            usuarioEmisorId: (publicacion as any).user?.id || (publicacion as any).usuarioId || 0, // La otra persona ofrece su producto
+            usuarioEmisorId: otroUsuarioId || (publicacion as any).user?.id || (publicacion as any).usuarioId || 0, // La otra persona ofrece su producto
             usuarioReceptorId: currentUserId,
             publicacionId: publicacion.id,
             cantidad: cantidadAPedir,
