@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { Transaction, TransactionState } from './entities/transactions.entity';
 import { TransactionDetail } from './entities/transaction-details.entity';
 import { Publication } from '../publications/publications.entity';
@@ -25,6 +25,7 @@ export class TransactionsService {
     private readonly publicationRepository: Repository<Publication>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private readonly dataSource: DataSource,
   ) { }
 
   // HU4 - Crear Transacción (Solicitar insumos)
@@ -147,60 +148,88 @@ export class TransactionsService {
     return transaccion;
   }
 
-  //  HU5, HU6 - Aprobar, rechazar, completar o cancelar transacción
+  // HU5, HU6 - Aprobar, rechazar, completar o cancelar transacción
   async updateStatus(id: number, dto: UpdateTransactionDto) {
     const transaccion = await this.findOne(id);
 
     // Validación de seguridad (HU6)
+    let isIniciador = false;
     if (dto.actionUserId) {
-      const isIniciador = transaccion.detalles[0]?.usuarioEmisor?.id === dto.actionUserId;
+      isIniciador = transaccion.detalles[0]?.usuarioEmisor?.id === dto.actionUserId;
       if (dto.estado === TransactionState.CANCELLED && !isIniciador) {
         throw new UnauthorizedException('Solo el iniciador puede cancelar la solicitud');
       }
       if ((dto.estado === TransactionState.COMPLETED || dto.estado === TransactionState.REJECTED) && isIniciador) {
-        throw new UnauthorizedException('Solo el usuario receptor puede aprobar o rechazar la solicitud');
-      }
-    }
-
-    // Validar transición de estados
-    if (
-      transaccion.estado === TransactionState.CANCELLED ||
-      transaccion.estado === TransactionState.REJECTED
-    ) {
-      throw new BadRequestException(
-        'No se puede modificar una transacción cancelada o rechazada',
-      );
-    }
-
-    if (transaccion.estado === TransactionState.COMPLETED) {
-      throw new BadRequestException(
-        'No se puede modificar una transacción ya completada',
-      );
-    }
-
-    // HU5 - Al completar (o aprobar definitivamente), restar stock
-    // Nota: El ERS dice "asegurar disponibilidad al aprobar". Y "Al pasar a finalizada mantener trazabilidad".
-    // Restamos el stock aquí cuando se completa o se aprueba. Asumiremos que se resta al completarse.
-    if (dto.estado === TransactionState.COMPLETED) {
-      for (const det of transaccion.detalles) {
-        const pub = await this.publicationRepository.findOne({
-          where: { id: det.publicacion.id },
-        });
-        if (pub && pub.cantidad >= det.cantidad) {
-          pub.cantidad -= det.cantidad;
-          // Si la cantidad llega a 0, se puede marcar como inactiva según la regla de negocio
-          if (pub.cantidad === 0) {
-            pub.isActive = false;
-          }
-          await this.publicationRepository.save(pub);
-        } else {
-          throw new BadRequestException(
-            `No hay stock suficiente para completar el trueque de la publicación ${det.publicacion.id}`,
-          );
+        // En el flujo de dos pasos, el iniciador SÍ puede enviar COMPLETED (para confirmar su parte).
+        // Pero no puede rechazarla.
+        if (dto.estado === TransactionState.REJECTED) {
+          throw new UnauthorizedException('Solo el usuario receptor puede rechazar la solicitud');
         }
       }
     }
 
+    if (transaccion.estado === TransactionState.CANCELLED || transaccion.estado === TransactionState.REJECTED) {
+      throw new BadRequestException('No se puede modificar una transacción cancelada o rechazada');
+    }
+    if (transaccion.estado === TransactionState.COMPLETED) {
+      throw new BadRequestException('No se puede modificar una transacción ya completada');
+    }
+
+    // Lógica de confirmación mutua (HU6) y concurrencia (HU5)
+    if (dto.estado === TransactionState.COMPLETED) {
+      if (!dto.actionUserId) {
+        throw new BadRequestException('Se requiere actionUserId para confirmar el trueque');
+      }
+
+      if (isIniciador) {
+        transaccion.iniciadorConfirmo = true;
+      } else {
+        transaccion.receptorConfirmo = true;
+      }
+
+      // Si ambos confirmaron, se descuenta el stock y se completa la transacción
+      if (transaccion.iniciadorConfirmo && transaccion.receptorConfirmo) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+          for (const det of transaccion.detalles) {
+            // Bloqueo pesimista para evitar stock negativo (HU5)
+            const pub = await queryRunner.manager.findOne(Publication, {
+              where: { id: det.publicacion.id },
+              lock: { mode: 'pessimistic_write' },
+            });
+
+            if (pub && pub.cantidad >= det.cantidad) {
+              pub.cantidad -= det.cantidad;
+              if (pub.cantidad === 0) {
+                pub.isActive = false;
+              }
+              await queryRunner.manager.save(pub);
+            } else {
+              throw new BadRequestException(`No hay stock suficiente para la publicación ${det.publicacion.id}`);
+            }
+          }
+
+          transaccion.estado = TransactionState.COMPLETED;
+          const savedTransaction = await queryRunner.manager.save(transaccion);
+          
+          await queryRunner.commitTransaction();
+          return savedTransaction;
+        } catch (error) {
+          await queryRunner.rollbackTransaction();
+          throw error;
+        } finally {
+          await queryRunner.release();
+        }
+      } else {
+        // Aún falta uno por confirmar, solo guardamos las banderas, el estado sigue pendiente
+        return await this.transactionRepository.save(transaccion);
+      }
+    }
+
+    // Para CANCELLED y REJECTED
     transaccion.estado = dto.estado;
     return await this.transactionRepository.save(transaccion);
   }
@@ -219,49 +248,68 @@ export class TransactionsService {
     return await this.transactionRepository.save(transaccion);
   }
 
-  // HU7 - Calificar transacción
+  // HU7 - Calificar transacción (dual)
   async rateTransaction(id: number, dto: RateTransactionDto) {
     const transaccion = await this.findOne(id);
 
     if (transaccion.estado !== TransactionState.COMPLETED) {
-      throw new BadRequestException(
-        'Solo se pueden calificar transacciones finalizadas/completadas',
-      );
+      throw new BadRequestException('Solo se pueden calificar transacciones completadas');
     }
 
-    if (transaccion.calificacion != null) {
-      throw new BadRequestException('Esta transacción ya fue calificada');
+    if (!dto.actionUserId) {
+      throw new BadRequestException('Se requiere actionUserId para calificar');
     }
 
-    transaccion.calificacion = dto.calificacion;
+    const isIniciador = transaccion.detalles[0]?.usuarioEmisor?.id === dto.actionUserId;
+
+    if (isIniciador) {
+      if (transaccion.calificacionAlReceptor != null) {
+        throw new BadRequestException('Ya calificaste al receptor');
+      }
+      transaccion.calificacionAlReceptor = dto.calificacion;
+    } else {
+      if (transaccion.calificacionAlIniciador != null) {
+        throw new BadRequestException('Ya calificaste al iniciador');
+      }
+      transaccion.calificacionAlIniciador = dto.calificacion;
+    }
+
     return await this.transactionRepository.save(transaccion);
   }
 
-  // HU7 - Calcular reputación de usuario
+  // HU7 - Calcular reputación de usuario (individualizada)
   async getUserReputation(userId: number) {
-    const query = this.transactionRepository.createQueryBuilder('t')
+    const transacciones = await this.transactionRepository.createQueryBuilder('t')
       .innerJoin('t.detalles', 'd')
       .innerJoin('d.usuarioEmisor', 'ue')
       .innerJoin('d.usuarioReceptor', 'ur')
       .where('(ue.id = :userId OR ur.id = :userId)', { userId })
       .andWhere('t.estado = :estado', { estado: TransactionState.COMPLETED })
-      .andWhere('t.calificacion IS NOT NULL');
+      .getMany();
 
-    const transacciones = await query.getMany();
+    let suma = 0;
+    let cantidad = 0;
 
-    if (transacciones.length === 0) {
-      return {
-        average: 0,
-        total: 0
-      };
+    for (const t of transacciones) {
+      const isIniciador = t.detalles[0]?.usuarioEmisor?.id === userId;
+      if (isIniciador && t.calificacionAlIniciador != null) {
+        suma += t.calificacionAlIniciador;
+        cantidad++;
+      }
+      if (!isIniciador && t.calificacionAlReceptor != null) {
+        suma += t.calificacionAlReceptor;
+        cantidad++;
+      }
     }
 
-    const suma = transacciones.reduce((acc, t) => acc + t.calificacion, 0);
-    const average = suma / transacciones.length;
+    if (cantidad === 0) {
+      return { average: 0, total: 0 };
+    }
 
+    const average = suma / cantidad;
     return {
       average: parseFloat(average.toFixed(1)),
-      total: transacciones.length
+      total: cantidad
     };
   }
 }

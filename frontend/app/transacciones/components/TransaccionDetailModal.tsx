@@ -98,7 +98,7 @@ export default function TransaccionDetailModal({
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ calificacion: rating }),
+          body: JSON.stringify({ calificacion: rating, actionUserId: currentUserId }),
         }
       );
       if (res.ok) {

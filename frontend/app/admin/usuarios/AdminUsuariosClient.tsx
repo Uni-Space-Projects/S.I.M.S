@@ -82,12 +82,15 @@ export default function AdminUsuariosClient() {
     if (!pendingChange) return;
 
     try {
+      const storedUser = localStorage.getItem("user");
+      const adminId = storedUser ? JSON.parse(storedUser).id : null;
+
       const res = await fetch(`http://localhost:3000/users/${pendingChange.userId}/role`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ rol: pendingChange.newRole }),
+        body: JSON.stringify({ rol: pendingChange.newRole, adminId }),
       });
 
       if (res.ok) {

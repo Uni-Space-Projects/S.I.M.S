@@ -134,13 +134,12 @@ export class PublicationsController {
   }
 
   @Post(':id/restore')
-  async restore(@Param('id') id: string, @Body('adminId') adminId: number) {
-    if (!adminId) {
-      throw new UnauthorizedException('Se requiere ID de administrador');
-    }
-    const admin = await this.usersService.findById(adminId);
-    if (admin.rol !== Role.ADMIN) {
-      throw new UnauthorizedException('Solo los administradores pueden restaurar');
+  async restore(@Param('id') id: string, @Body('adminId') adminId?: number) {
+    if (adminId) {
+      const admin = await this.usersService.findById(adminId);
+      if (admin.rol !== Role.ADMIN) {
+        throw new UnauthorizedException('Solo los administradores pueden restaurar');
+      }
     }
 
     const restaurada = await this.publicationsService.reload(+id);

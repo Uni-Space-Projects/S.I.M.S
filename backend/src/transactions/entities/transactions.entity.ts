@@ -24,7 +24,16 @@ export class Transaction {
   estado: TransactionState;
 
   @Column({ type: 'int', nullable: true })
-  calificacion: number;
+  calificacionAlIniciador: number;
+
+  @Column({ type: 'int', nullable: true })
+  calificacionAlReceptor: number;
+
+  @Column({ type: 'boolean', default: false })
+  iniciadorConfirmo: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  receptorConfirmo: boolean;
 
   @OneToMany(() => TransactionDetail, (detail) => detail.transaccion, {
     cascade: true,
@@ -34,12 +43,18 @@ export class Transaction {
   constructor(
     id?: number,
     estado?: TransactionState,
-    calificacion?: number,
+    calificacionAlIniciador?: number,
+    calificacionAlReceptor?: number,
+    iniciadorConfirmo?: boolean,
+    receptorConfirmo?: boolean,
     detalles?: TransactionDetail[],
   ) {
     if (id) this.id = id;
     if (estado) this.estado = estado;
-    if (calificacion) this.calificacion = calificacion;
+    if (calificacionAlIniciador !== undefined) this.calificacionAlIniciador = calificacionAlIniciador;
+    if (calificacionAlReceptor !== undefined) this.calificacionAlReceptor = calificacionAlReceptor;
+    if (iniciadorConfirmo !== undefined) this.iniciadorConfirmo = iniciadorConfirmo;
+    if (receptorConfirmo !== undefined) this.receptorConfirmo = receptorConfirmo;
     if (detalles) this.detalles = detalles;
   }
 }
