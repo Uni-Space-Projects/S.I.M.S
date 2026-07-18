@@ -42,7 +42,12 @@ export default function InicioClient() {
 
     const storedUserId = localStorage.getItem("sims_user_id");
     if (storedUserId) {
-      setCurrentUserId(parseInt(storedUserId, 10));
+      try {
+        const parsed = JSON.parse(storedUserId);
+        setCurrentUserId(parseInt(parsed, 10));
+      } catch {
+        setCurrentUserId(parseInt(storedUserId, 10));
+      }
     }
 
     fetchAllPublications();

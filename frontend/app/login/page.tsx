@@ -40,7 +40,7 @@ export default function LoginPage() {
                 localStorage.setItem("sims_user_id", JSON.stringify(data.id));
 
                 setTimeout(() => {
-                    router.push("/inicio");
+                    window.location.href = "/inicio";
                 }, 500);
             } else {
                 setMessage(data.message || "Error al iniciar sesión");
