@@ -85,7 +85,8 @@ export default function PublicationsClient() {
     if (!pubToDelete) return;
 
     try {
-      await fetch(`http://localhost:3000/publications/${id}`, { method: "DELETE" });
+      const response = await fetch(`http://localhost:3000/publications/${id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("No se pudo eliminar en el backend");
       setLastDeletedPublication(pubToDelete);
       setPublications((prev) => prev.filter((pub) => pub.id !== id));
       setToastMessage("Publicación eliminada.");

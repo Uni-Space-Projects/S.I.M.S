@@ -61,7 +61,7 @@ export class PublicationListenersService {
 
     // Aquí la lógica inversa (esperando a que termine):
     try {
-      await this.publicationRepository.save(event.publicationData);
+      await this.publicationRepository.insert(event.publicationData);
       await this.publicationDeletedRepository.delete(event.publicationId);
     } catch (error) {
       console.error('Error al restaurar la publicación:', error);

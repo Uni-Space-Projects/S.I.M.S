@@ -70,7 +70,7 @@ export default function TransaccionDetailModal({
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ estado: newStatus }),
+          body: JSON.stringify({ estado: newStatus, actionUserId: currentUserId }),
         }
       );
 
@@ -133,7 +133,7 @@ export default function TransaccionDetailModal({
               {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ estado: "rechazada" }),
+                body: JSON.stringify({ estado: "rechazada", actionUserId: currentUserId }),
               }
             );
           } catch (e) {

@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -138,6 +139,17 @@ export class TransactionsService {
   async updateStatus(id: number, dto: UpdateTransactionDto) {
     const transaccion = await this.findOne(id);
 
+    // Validación de seguridad (HU6)
+    if (dto.actionUserId) {
+      const isIniciador = transaccion.detalles[0]?.usuarioEmisor?.id === dto.actionUserId;
+      if (dto.estado === TransactionState.CANCELLED && !isIniciador) {
+        throw new UnauthorizedException('Solo el iniciador puede cancelar la solicitud');
+      }
+      if ((dto.estado === TransactionState.COMPLETED || dto.estado === TransactionState.REJECTED) && isIniciador) {
+        throw new UnauthorizedException('Solo el usuario receptor puede aprobar o rechazar la solicitud');
+      }
+    }
+
     // Validar transición de estados
     if (
       transaccion.estado === TransactionState.CANCELLED ||
@@ -211,5 +223,31 @@ export class TransactionsService {
 
     transaccion.calificacion = dto.calificacion;
     return await this.transactionRepository.save(transaccion);
+  }
+
+  // 🔵 HU7 - Calcular reputación de usuario
+  async getUserReputation(userId: number) {
+    const query = this.transactionRepository.createQueryBuilder('t')
+      .innerJoin('t.detalles', 'd')
+      .where('d.usuarioEmisorId = :userId', { userId })
+      .andWhere('t.estado = :estado', { estado: TransactionState.COMPLETED })
+      .andWhere('t.calificacion IS NOT NULL');
+
+    const transacciones = await query.getMany();
+
+    if (transacciones.length === 0) {
+      return { 
+        average: 0, 
+        total: 0 
+      };
+    }
+
+    const suma = transacciones.reduce((acc, t) => acc + t.calificacion, 0);
+    const average = suma / transacciones.length;
+
+    return {
+      average: parseFloat(average.toFixed(1)),
+      total: transacciones.length
+    };
   }
 }

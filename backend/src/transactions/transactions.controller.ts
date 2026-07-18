@@ -89,4 +89,10 @@ export class TransactionsController {
     }
     return calificada;
   }
+
+  // 🔵 HU7 - Consultar reputación del usuario
+  @Get('reputation/:userId')
+  async getReputation(@Param('userId', ParseIntPipe) userId: number) {
+    return this.transactionsService.getUserReputation(userId);
+  }
 }

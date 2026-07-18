@@ -135,7 +135,7 @@ export class PublicationsService {
     const publication = await this.findOne(id);
     publication.isActive = false;
 
-    this.eventEmitter.emit(
+    await this.eventEmitter.emitAsync(
       'publication.deleted',
       new PublicationDeletedEvent(id, publication),
     );
@@ -162,7 +162,7 @@ export class PublicationsService {
       user: deletedPub.user,
     });
 
-    this.eventEmitter.emit(
+    await this.eventEmitter.emitAsync(
       'publication.restored',
       new PublicationRestoredEvent(id, publication),
     );
