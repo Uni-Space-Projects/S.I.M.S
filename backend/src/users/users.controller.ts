@@ -90,4 +90,5 @@ export class UsersController {
     delete (result as Partial<UserEntity>).contrasena;
     return result;
   }
+
 }

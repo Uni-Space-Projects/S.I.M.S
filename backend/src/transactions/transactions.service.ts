@@ -229,7 +229,9 @@ export class TransactionsService {
   async getUserReputation(userId: number) {
     const query = this.transactionRepository.createQueryBuilder('t')
       .innerJoin('t.detalles', 'd')
-      .where('d.usuarioEmisorId = :userId', { userId })
+      .innerJoin('d.usuarioEmisor', 'ue')
+      .innerJoin('d.usuarioReceptor', 'ur')
+      .where('(ue.id = :userId OR ur.id = :userId)', { userId })
       .andWhere('t.estado = :estado', { estado: TransactionState.COMPLETED })
       .andWhere('t.calificacion IS NOT NULL');
 
