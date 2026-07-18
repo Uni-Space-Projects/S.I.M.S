@@ -11,6 +11,7 @@ interface CreatePublicationModalProps {
     lote: string;
     expirationDate: string;
     description: string;
+    cantidad: number;
   }) => void;
 }
 
@@ -24,6 +25,7 @@ export default function CreatePublicationModal({
   const [lote, setLote] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
   const [description, setDescription] = useState("");
+  const [cantidad, setCantidad] = useState(1);
 
   const isEditing = !!publication;
 
@@ -35,12 +37,14 @@ export default function CreatePublicationModal({
         setLote(publication.lote);
         setExpirationDate(publication.expirationDate);
         setDescription(publication.description || "");
+        setCantidad(publication.cantidad || 1);
       } else {
         // Limpiar formulario para nueva creación
         setName("");
         setLote("");
         setExpirationDate("");
         setDescription("");
+        setCantidad(1);
       }
     }, 0);
     return () => clearTimeout(timer);
@@ -61,7 +65,9 @@ export default function CreatePublicationModal({
   const isFormValid =
     name.trim() !== "" &&
     lote.trim() !== "" &&
-    expirationDate !== "";
+    expirationDate !== "" &&
+    cantidad >= 1 &&
+    cantidad <= 99;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,6 +78,7 @@ export default function CreatePublicationModal({
       lote: lote.trim(),
       expirationDate,
       description: description.trim(),
+      cantidad: Number(cantidad),
     });
   };
 
@@ -171,6 +178,27 @@ export default function CreatePublicationModal({
                   className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 text-on-surface font-body-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all cursor-pointer"
                 />
               </div>
+            </div>
+
+            {/* Cantidad */}
+            <div className="flex flex-col gap-1">
+              <label
+                className="font-label-sm text-label-sm text-on-surface-variant font-semibold text-xs"
+                htmlFor="insumo-cantidad"
+              >
+                Cantidad
+              </label>
+              <input
+                id="insumo-cantidad"
+                name="insumo-cantidad"
+                value={cantidad}
+                onChange={(e) => setCantidad(Number(e.target.value))}
+                type="number"
+                min={1}
+                max={99}
+                required
+                className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-2 text-on-surface font-body-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+              />
             </div>
 
             {/* Descripción */}

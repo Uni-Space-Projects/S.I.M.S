@@ -130,6 +130,7 @@ export default function PublicationsClient() {
     lote: string;
     expirationDate: string;
     description: string;
+    cantidad: number;
   }) => {
     const storedUserId = localStorage.getItem("sims_user_id");
     const userId = storedUserId ? parseInt(storedUserId, 10) : 1; // Fallback a 1
@@ -145,6 +146,7 @@ export default function PublicationsClient() {
             lote: data.lote,
             expirationDate: data.expirationDate,
             description: data.description,
+            cantidad: data.cantidad,
           }),
         });
 
@@ -172,6 +174,7 @@ export default function PublicationsClient() {
             description: data.description,
             type: "MEDICAMENTO", // Valor por defecto
             userId: userId,
+            cantidad: data.cantidad,
           }),
         });
 

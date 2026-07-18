@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { ILike, Repository, MoreThan } from 'typeorm';
 import { Publication } from './publications.entity';
 import { CreatePublicationDto } from './Dto/create-publication.dto';
 import { UpdatePublicationDto } from './Dto/update-publication.dto';
@@ -39,9 +39,13 @@ export class PublicationsService {
 
   // 🔵 OBTENER TODAS (solo activas y no vencidas)
   async findAll() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const publicaciones = await this.publicationRepository.find({
       where: {
         isActive: true,
+        expirationDate: MoreThan(today),
       },
       relations: ['user'],
     });
@@ -55,9 +59,13 @@ export class PublicationsService {
 
   // 🔵 OBTENER TODAS POR USUARIO
   async findByUser(userId: number) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const usurario = await this.publicationRepository.find({
       where: {
         isActive: true,
+        expirationDate: MoreThan(today),
         user: { id: userId },
       },
       //La base de datos tiene que cargar las tablas que estan relacionadas a las peticiones.

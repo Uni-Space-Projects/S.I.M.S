@@ -18,5 +18,6 @@ export interface PublicacionInsumo {
   additionalInfo?: string;
   type: string;
   isActive: boolean;
+  cantidad: number;
   user?: UserBasic;
 }

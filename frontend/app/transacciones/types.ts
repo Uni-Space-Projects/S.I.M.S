@@ -13,7 +13,7 @@ export interface PublicationBasicInfo {
   name: string;
   category: string;
   image: string;
-  quantity: number;
+  cantidad: number;
   isActive: boolean;
   dueDate: string;
 }

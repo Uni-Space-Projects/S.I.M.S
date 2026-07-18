@@ -73,12 +73,12 @@ export default function SolicitudTransaccionModal({
       alert("Por favor, selecciona una publicación tuya para ofrecer a cambio.");
       return;
     }
-    if (cantidadAPedir <= 0 || cantidadAPedir > publicacion.quantity) {
-      alert("Cantidad solicitada inválida o excede el stock disponible.");
+    if (cantidadAPedir <= 0 || cantidadAPedir > publicacion.cantidad) {
+      alert("La cantidad solicitada debe ser mayor a 0 y no exceder el stock disponible.");
       return;
     }
-    if (cantidadAOfrecer <= 0 || cantidadAOfrecer > selectedOffer.quantity) {
-      alert("Cantidad ofrecida inválida o excede tu stock disponible.");
+    if (cantidadAOfrecer <= 0 || cantidadAOfrecer > selectedOffer.cantidad) {
+      alert("La cantidad ofrecida debe ser mayor a 0 y no exceder el stock disponible de tu insumo.");
       return;
     }
 
@@ -269,8 +269,8 @@ export default function SolicitudTransaccionModal({
                         <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-blue-100 shadow-inner">
                            <span className="text-4xl">📦</span>
                         </div>
-                        <h3 className="mt-4 text-center text-lg font-bold text-gray-900">{selectedOffer.name}</h3>
-                        <p className="text-sm text-gray-500">Disponible: {selectedOffer.quantity}</p>
+                        <h3 className="font-semibold text-gray-900 truncate pr-8">{selectedOffer.name}</h3>
+                        <p className="text-sm text-gray-500">Disponible: {selectedOffer.cantidad}</p>
                      </div>
                      
                      <div className="mt-4 border-t border-blue-200 pt-4">

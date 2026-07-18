@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Patch } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, BadRequestException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { LoginDto } from './dto/Login.Dto';
 import { RegisterDto } from './dto/Register.Dto';
@@ -67,6 +67,11 @@ export class UsersController {
   // 🔵 OBTENER USUARIO POR ID (para perfil)
   @Get(':id')
   async findById(@Param('id') id: string) {
+    const parsedId = Number(id);
+    if (isNaN(parsedId) || parsedId <= 0) {
+      throw new BadRequestException('ID inválido');
+    }
+
     // Buscar en caché primero
     for (const usuario of this.cacheUsuarios) {
       if (usuario.id?.toString() === id) {

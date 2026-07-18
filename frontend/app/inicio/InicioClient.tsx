@@ -18,6 +18,8 @@ export default function InicioClient() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [hideExpired, setHideExpired] = useState(true);
 
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+
   // Estados para Modal de Detalles
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [selectedPub, setSelectedPub] = useState<PublicacionInsumo | null>(null);
@@ -37,6 +39,11 @@ export default function InicioClient() {
         setIsLoading(false);
       }
     };
+
+    const storedUserId = localStorage.getItem("sims_user_id");
+    if (storedUserId) {
+      setCurrentUserId(parseInt(storedUserId, 10));
+    }
 
     fetchAllPublications();
   }, []);
@@ -67,6 +74,9 @@ export default function InicioClient() {
   const filteredPublications = publications.filter((pub) => {
     // 1. Filtrar inactivos (Criterio: El sistema debe mostrar únicamente publicaciones activas y no vencidas)
     if (!pub.isActive) return false;
+
+    // 1.5. Filtrar propias: El usuario no debe ver sus propias publicaciones en el inicio
+    if (currentUserId && pub.user?.id === currentUserId) return false;
 
     // 2. Filtrar por Búsqueda (Nombre)
     if (searchQuery && !pub.name.toLowerCase().includes(searchQuery.toLowerCase())) {

@@ -4,6 +4,8 @@ import {
   IsDateString,
   IsOptional,
   IsNumber,
+  Min,
+  Max,
 } from 'class-validator';
 
 export class CreatePublicationDto {
@@ -31,9 +33,11 @@ export class CreatePublicationDto {
   @IsString()
   type: string; //TODO: Hacer enumerate de esto (etiquetas para el motor de busqueda).
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
-  cantidad: number;
+  @Min(1)
+  @Max(99)
+  cantidad?: number;
 
   @IsNotEmpty()
   @IsNumber()
