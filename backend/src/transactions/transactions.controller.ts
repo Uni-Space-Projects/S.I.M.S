@@ -20,7 +20,7 @@ export class TransactionsController {
 
   private cacheFind: Transaction[] = [];
 
-  // 🔵 HU4 - Crear Transacción
+  // HU4 - Crear Transacción
   @Post()
   async create(@Body() dto: CreateTransactionDto) {
     const nueva = await this.transactionsService.create(dto);
@@ -30,13 +30,13 @@ export class TransactionsController {
     return nueva;
   }
 
-  // 🔵 HU6 - Obtener todas las transacciones
+  // HU6 - Obtener todas las transacciones
   @Get()
   async findAll() {
     return this.transactionsService.findAll();
   }
 
-  // 🔵 Obtener por ID
+  // Obtener por ID
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     for (const trans of this.cacheFind) {
@@ -51,7 +51,7 @@ export class TransactionsController {
     return encontrada;
   }
 
-  // 🔵 Actualizar estado de la transacción (Aprobar, Completar, etc)
+  // Actualizar estado de la transacción (Aprobar, Completar, etc)
   @Put(':id/status')
   async updateStatus(
     @Param('id', ParseIntPipe) id: number,
@@ -65,7 +65,7 @@ export class TransactionsController {
     return actualizada;
   }
 
-  // 🔵 HU4 - Cancelar / Soft delete transacción
+  // HU4 - Cancelar / Soft delete transacción
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     const cancelada = await this.transactionsService.remove(id);
@@ -76,7 +76,7 @@ export class TransactionsController {
     return cancelada;
   }
 
-  // 🔵 HU7 - Calificar transacción
+  // HU7 - Calificar transacción
   @Put(':id/rate')
   async rateTransaction(
     @Param('id', ParseIntPipe) id: number,
@@ -90,7 +90,7 @@ export class TransactionsController {
     return calificada;
   }
 
-  // 🔵 HU7 - Consultar reputación del usuario
+  // HU7 - Consultar reputación del usuario
   @Get('reputation/:userId')
   async getReputation(@Param('userId', ParseIntPipe) userId: number) {
     return this.transactionsService.getUserReputation(userId);

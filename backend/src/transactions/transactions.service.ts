@@ -27,7 +27,7 @@ export class TransactionsService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  // 🔵 HU4 - Crear Transacción (Solicitar insumos)
+  // HU4 - Crear Transacción (Solicitar insumos)
   async create(dto: CreateTransactionDto) {
     if (!dto.detalles || dto.detalles.length === 0) {
       throw new BadRequestException(
@@ -104,7 +104,7 @@ export class TransactionsService {
     return await this.transactionRepository.save(transaction);
   }
 
-  // 🔵 HU6 - Obtener todas las transacciones
+  // HU6 - Obtener todas las transacciones
   async findAll() {
     const transacciones = await this.transactionRepository.find({
       relations: [
@@ -124,7 +124,7 @@ export class TransactionsService {
     return transacciones;
   }
 
-  // 🔵 Obtener transacción por ID
+  // Obtener transacción por ID
   async findOne(id: number) {
     const transaccion = await this.transactionRepository.findOne({
       where: { id },
@@ -147,7 +147,7 @@ export class TransactionsService {
     return transaccion;
   }
 
-  // 🔵 HU5, HU6 - Aprobar, rechazar, completar o cancelar transacción
+  //  HU5, HU6 - Aprobar, rechazar, completar o cancelar transacción
   async updateStatus(id: number, dto: UpdateTransactionDto) {
     const transaccion = await this.findOne(id);
 
@@ -205,7 +205,7 @@ export class TransactionsService {
     return await this.transactionRepository.save(transaccion);
   }
 
-  // 🔵 Soft Delete (HU4 - Cancelar transacciones)
+  // Soft Delete (HU4 - Cancelar transacciones)
   async remove(id: number) {
     const transaccion = await this.findOne(id);
 
@@ -219,7 +219,7 @@ export class TransactionsService {
     return await this.transactionRepository.save(transaccion);
   }
 
-  // 🔵 HU7 - Calificar transacción
+  // HU7 - Calificar transacción
   async rateTransaction(id: number, dto: RateTransactionDto) {
     const transaccion = await this.findOne(id);
 
@@ -237,7 +237,7 @@ export class TransactionsService {
     return await this.transactionRepository.save(transaccion);
   }
 
-  // 🔵 HU7 - Calcular reputación de usuario
+  // HU7 - Calcular reputación de usuario
   async getUserReputation(userId: number) {
     const query = this.transactionRepository.createQueryBuilder('t')
       .innerJoin('t.detalles', 'd')

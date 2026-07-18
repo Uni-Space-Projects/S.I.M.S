@@ -94,7 +94,7 @@ export class UsersService {
     );
   }
 
-  // 🔵 OBTENER USUARIO POR ID (para perfil)
+  // OBTENER USUARIO POR ID (para perfil)
   async findById(id: number) {
     const user = await this.userRepository.findOne({
       where: { id },

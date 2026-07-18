@@ -18,7 +18,7 @@ export class PublicationsController {
 
   private cacheFind: Publication[] = [];
 
-  // 🔵 CREAR PUBLICACIÓN
+  // CREAR PUBLICACIÓN
   @Post()
   async create(@Body() dto: CreatePublicationDto) {
     const nuevo = await this.publicationsService.create(dto);
@@ -28,13 +28,13 @@ export class PublicationsController {
     return nuevo;
   }
 
-  // 🔵 OBTENER TODAS
+  // OBTENER TODAS
   @Get()
   findAll() {
     return this.publicationsService.findAll();
   }
 
-  // 🔵 OBTENER POR USUARIO TODO: Preguntar a la profesora sobre esta implementacion ya que es muy ineficiente.
+  // OBTENER POR USUARIO TODO: Preguntar a la profesora sobre esta implementacion ya que es muy ineficiente.
   @Get('user/:userId')
   async findByUser(@Param('userId') userId: string) {
     const almacenadas: Publication[] = [];
@@ -70,7 +70,7 @@ export class PublicationsController {
     return almacenadas;
   }
 
-  // 🔵 OBTENER POR ID
+  // OBTENER POR ID
   @Get(':id')
   async findOne(@Param('id') id: string) {
     for (const publi of this.cacheFind) {
@@ -85,7 +85,7 @@ export class PublicationsController {
     return encontrado;
   }
 
-  // 🔵 ACTUALIZAR
+  // ACTUALIZAR
   @Put(':id')
   async update(
     @Param('id') id: string,
@@ -106,7 +106,7 @@ export class PublicationsController {
     return publicacionActualizada;
   }
 
-  // 🔵 ELIMINAR
+  // ELIMINAR
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     await this.publicationsService.remove(+id);

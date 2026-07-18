@@ -64,7 +64,7 @@ export class UsersController {
     };
   }
 
-  // 🔵 OBTENER USUARIO POR ID (para perfil)
+  // OBTENER USUARIO POR ID (para perfil)
   @Get(':id')
   async findById(@Param('id') id: string) {
     const parsedId = Number(id);

@@ -19,7 +19,7 @@ export class PublicationsService {
     private eventEmitter: EventEmitter2,
   ) {}
 
-  // 🔵 CREAR PUBLICACIÓN
+  // CREAR PUBLICACIÓN
   async create(dto: CreatePublicationDto) {
     const expiration = new Date(dto.expirationDate);
 
@@ -37,7 +37,7 @@ export class PublicationsService {
     return await this.publicationRepository.save(publication);
   }
 
-  // 🔵 OBTENER TODAS (solo activas y no vencidas)
+  // OBTENER TODAS (solo activas y no vencidas)
   async findAll() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -57,7 +57,7 @@ export class PublicationsService {
     return publicaciones;
   }
 
-  // 🔵 OBTENER TODAS POR USUARIO
+  // OBTENER TODAS POR USUARIO
   async findByUser(userId: number) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -79,11 +79,11 @@ export class PublicationsService {
     return usurario;
   }
 
-  // 🔵 OBTENER UNA POR NOMBRE
+  // OBTENER UNA POR NOMBRE
   async findByInitialText(term: string) {
     const publications = await this.publicationRepository.find({
       where: {
-        // 🔵 2. Lo aplicas aquí. Si 'term' es "hola", buscará "Hola", "HOLA", "hola", etc.
+        // 2. Lo aplicas aquí. Si 'term' es "hola", buscará "Hola", "HOLA", "hola", etc.
         name: ILike(`${term}%`),
         isActive: true,
       },
@@ -96,7 +96,7 @@ export class PublicationsService {
     return publications;
   }
 
-  // 🔵 OBTENER UNA POR ID
+  // OBTENER UNA POR ID
   async findOne(id: number) {
     const publication = await this.publicationRepository.findOne({
       where: { id },
@@ -111,7 +111,7 @@ export class PublicationsService {
     return publication;
   }
 
-  // 🔵 ACTUALIZAR
+  // ACTUALIZAR
   async update(id: number, dto: UpdatePublicationDto) {
     const publication = await this.findOne(id);
 
@@ -130,7 +130,7 @@ export class PublicationsService {
     return this.publicationRepository.save(publication);
   }
 
-  // 🔵 ELIMINAR (soft delete)
+  // ELIMINAR (soft delete)
   async remove(id: number) {
     const publication = await this.findOne(id);
     publication.isActive = false;
@@ -170,7 +170,7 @@ export class PublicationsService {
     return publication;
   }
 
-  // 🔵 DESACTIVAR (para moderación de administrador sin borrar la entidad y romper FKey de reportes)
+  // DESACTIVAR (para moderación de administrador sin borrar la entidad y romper FKey de reportes)
   async deactivate(id: number) {
     const publication = await this.publicationRepository.findOne({
       where: { id },
