@@ -10,6 +10,9 @@ import { ReportsModule } from './reports/reports.module';
 @Module({
   //Informacion necesaria para conectar una base de datos local con postgresql
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
