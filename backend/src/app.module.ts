@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PublicationsModule } from './publications/publications.module';
@@ -11,11 +12,11 @@ import { ReportsModule } from './reports/reports.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      host: process.env.DB_HOST,
       port: 5432,
-      username: 'postgres',
-      password: 'REDACTED_PASSWORD',
-      database: 'trueque_medicinas',
+      username: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
       autoLoadEntities: true,
       //nest crea las tabla automaticamente
       synchronize: true, // ⚠️ solo desarrollo
